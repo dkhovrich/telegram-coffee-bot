@@ -1,0 +1,44 @@
+{
+    "name": "telegram-coffee-bot",
+    "version": "1.0.0",
+    "description": "Telegram bot for coffee capsules calculation",
+    "main": "index.mjs",
+    "type": "module",
+    "scripts": {
+        "build": "rimraf ./dist && tsc",
+        "start": "node dist/index.mjs",
+        "dev": "nodemon --watch './**/*.mts' --exec 'node --experimental-specifier-resolution=node --loader ts-node/esm' src/index.mts",
+        "lint": "eslint ./src --ext .ts",
+        "format": "eslint ./src --ext .ts --fix"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/dkhovrich/telegram-coffee-bot.git"
+    },
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/dkhovrich/telegram-coffee-bot/issues"
+    },
+    "homepage": "https://github.com/dkhovrich/telegram-coffee-bot#readme",
+    "devDependencies": {
+        "@types/dotenv": "^8.2.0",
+        "@types/node": "^18.15.7",
+        "@typescript-eslint/eslint-plugin": "^5.56.0",
+        "eslint": "^8.36.0",
+        "eslint-config-prettier": "^8.8.0",
+        "eslint-plugin-import": "^2.27.5",
+        "eslint-plugin-n": "^15.6.1",
+        "eslint-plugin-promise": "^6.1.1",
+        "nodemon": "^2.0.22",
+        "prettier": "^2.8.7",
+        "rimraf": "^4.4.1",
+        "ts-node": "^10.9.1",
+        "typescript": "^5.0.2"
+    },
+    "dependencies": {
+        "brandi": "^5.0.0",
+        "dotenv": "^16.0.3",
+        "telegraf": "^4.12.2"
+    }
+}
