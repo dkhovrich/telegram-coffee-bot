@@ -8,8 +8,8 @@
         "build": "rimraf ./dist && tsc",
         "start": "node dist/index.mjs",
         "dev": "nodemon --watch './**/*.mts' --exec 'node --experimental-specifier-resolution=node --loader ts-node/esm' src/index.mts",
-        "lint": "eslint ./src --ext .ts",
-        "format": "eslint ./src --ext .ts --fix"
+        "lint": "eslint ./src --ext .mts",
+        "format": "eslint ./src --ext .mts --fix"
     },
     "repository": {
         "type": "git",
@@ -39,6 +39,7 @@
     "dependencies": {
         "brandi": "^5.0.0",
         "dotenv": "^16.0.3",
-        "telegraf": "^4.12.2"
+        "telegraf": "^4.12.2",
+        "telegraf-session-local": "^2.1.1"
     }
 }
