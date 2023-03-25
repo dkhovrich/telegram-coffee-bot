@@ -1,28 +1,17 @@
-import { Command } from "./command.mjs";
-import { Markup, Telegraf } from "telegraf";
-import { BotContext } from "../context.mjs";
+import { fmt } from "telegraf/format";
+import { Command, CommandType } from "./command.mjs";
 
 export class StartCommand extends Command {
-    handle(bot: Telegraf<BotContext>): void {
-        bot.start(ctx => {
-            console.log(ctx);
+    get type(): CommandType {
+        return CommandType.Start;
+    }
+
+    handle(): void {
+        this.bot.start(ctx => {
+            this.setCommandState(ctx.session);
             ctx.reply(
-                "Hello!",
-                Markup.inlineKeyboard([
-                    Markup.button.callback("Like", "like"),
-                    Markup.button.callback("Dislike", "dislike")
-                ])
+                fmt`Please use one of the following commands: /${CommandType.Add}, /${CommandType.Reset}, /${CommandType.Balance}, /${CommandType.History}`
             );
-        });
-
-        bot.action("like", ctx => {
-            ctx.session.courseLike = true;
-            ctx.editMessageText("You liked the course!");
-        });
-
-        bot.action("dislike", ctx => {
-            ctx.session.courseLike = false;
-            ctx.editMessageText("You disliked the course!");
         });
     }
 }

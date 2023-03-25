@@ -1,9 +1,10 @@
 import { Context } from "telegraf";
+import { CommandType } from "./commands/command.mjs";
 
-export interface SessionData {
-    courseLike: boolean;
+export interface Session {
+    commandState: CommandType | null;
 }
 
 export interface BotContext extends Context {
-    session: SessionData;
+    session: Session;
 }
