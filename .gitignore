@@ -105,4 +105,4 @@ dist
 
 .idea
 
-database.json
+session.json

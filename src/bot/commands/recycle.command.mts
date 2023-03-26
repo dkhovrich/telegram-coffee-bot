@@ -1,6 +1,6 @@
 import { Command } from "./command.mjs";
-import { StorageService } from "../../services/storage.service.mjs";
 import { Markup } from "telegraf";
+import { StorageService } from "../../storage/storage.types.mjs";
 
 export class RecycleCommand extends Command {
     private readonly confirmButtonId = "reset-confirm";
@@ -13,7 +13,7 @@ export class RecycleCommand extends Command {
 
     public handle(): void {
         this.bot.command("recycle", async ctx => {
-            const amount = await this.storage.getAmount();
+            const amount = await this.storage.get();
             if (amount < RecycleCommand.MIN_RECYCLE_AMOUNT) {
                 ctx.reply("You don't have enough capsules to recycle! ♻️");
                 return;

@@ -1,6 +1,6 @@
 import { Context, Telegraf } from "telegraf";
 import { ConfigService } from "../services/config.service.mjs";
-import { Middleware } from "./middlewares/middleware.types.js";
+import { Middleware } from "./middlewares/middleware.types.mjs";
 import { Command } from "./commands/command.mjs";
 
 export class Bot {

@@ -1,5 +1,5 @@
 import { Context, Middleware as TelegrafMiddleware } from "telegraf";
-import { Middleware } from "./middleware.types.js";
+import { Middleware } from "./middleware.types.mjs";
 
 export class AuthMiddleware implements Middleware {
     private readonly allowedUsers = [];

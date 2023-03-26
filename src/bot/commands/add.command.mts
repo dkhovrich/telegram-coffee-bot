@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { Command } from "./command.mjs";
-import { StorageService } from "../../services/storage.service.mjs";
 import { QuestionWithConfirmation } from "../question-with-confirmation.mjs";
+import { StorageService } from "../../storage/storage.types.mjs";
 
 export class AddCommand extends Command {
     public constructor(private readonly storage: StorageService) {

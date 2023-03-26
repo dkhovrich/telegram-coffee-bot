@@ -3,18 +3,21 @@ import { ConfigService, ConfigServiceImpl } from "./services/config.service.mjs"
 import { Bot } from "./bot/bot.mjs";
 import { StartCommand } from "./bot/commands/start.command.mjs";
 import { Command } from "./bot/commands/command.mjs";
-import { Middleware } from "./bot/middlewares/middleware.types.js";
+import { Middleware } from "./bot/middlewares/middleware.types.mjs";
 import { SessionMiddleware } from "./bot/middlewares/session.middleware.mjs";
 import { AuthMiddleware } from "./bot/middlewares/auth.middleware.mjs";
 import { AddCommand } from "./bot/commands/add.command.mjs";
 import { RecycleCommand } from "./bot/commands/recycle.command.mjs";
 import { BalanceCommand } from "./bot/commands/balance.command.mjs";
 import { HistoryCommand } from "./bot/commands/history.command.mjs";
-import { StorageService, StorageServiceImpl } from "./services/storage.service.mjs";
+import { StorageService } from "./storage/storage.types.mjs";
+import { StorageServiceImpl } from "./storage/storage.service.mts.js";
+import { StorageRepository } from "./storage/storage.repository.mjs";
 
 export const TOKENS = {
     configService: token<ConfigService>("config"),
     bot: token<Bot>("bot"),
+    storageRepository: token<StorageRepository>("storage.repository"),
     storageService: token<StorageService>("storage"),
     middlewares: {
         session: token<Middleware>("middleware.session"),
@@ -68,6 +71,11 @@ function bindCommands(container: Container): void {
 export function createContainer(): Container {
     const container = new Container();
     container.bind(TOKENS.configService).toInstance(ConfigServiceImpl).inSingletonScope();
+
+    injected(StorageRepository, TOKENS.configService);
+    container.bind(TOKENS.storageRepository).toInstance(StorageRepository).inSingletonScope();
+
+    injected(StorageServiceImpl, TOKENS.storageRepository);
     container.bind(TOKENS.storageService).toInstance(StorageServiceImpl).inSingletonScope();
 
     bindMiddlewares(container);
