@@ -7,7 +7,7 @@ import { Middleware } from "./bot/middlewares/middleware.types.js";
 import { SessionMiddleware } from "./bot/middlewares/session.middleware.mjs";
 import { AuthMiddleware } from "./bot/middlewares/auth.middleware.mjs";
 import { AddCommand } from "./bot/commands/add.command.mjs";
-import { ResetCommand } from "./bot/commands/reset.command.mjs";
+import { RecycleCommand } from "./bot/commands/recycle.command.mjs";
 import { BalanceCommand } from "./bot/commands/balance.command.mjs";
 import { HistoryCommand } from "./bot/commands/history.command.mjs";
 import { StorageService, StorageServiceImpl } from "./services/storage.service.mjs";
@@ -24,7 +24,7 @@ export const TOKENS = {
     commands: {
         start: token<Command>("command.start"),
         add: token<Command>("command.add"),
-        reset: token<Command>("command.reset"),
+        recycle: token<Command>("command.recycle"),
         balance: token<Command>("command.balance"),
         history: token<Command>("command.history"),
         all: token<Command[]>("commands")
@@ -45,7 +45,8 @@ function bindCommands(container: Container): void {
     injected(AddCommand, TOKENS.storageService);
     container.bind(TOKENS.commands.add).toInstance(AddCommand).inSingletonScope();
 
-    container.bind(TOKENS.commands.reset).toInstance(ResetCommand).inSingletonScope();
+    injected(RecycleCommand, TOKENS.storageService);
+    container.bind(TOKENS.commands.recycle).toInstance(RecycleCommand).inSingletonScope();
 
     injected(BalanceCommand, TOKENS.storageService);
     container.bind(TOKENS.commands.balance).toInstance(BalanceCommand).inSingletonScope();
@@ -57,7 +58,7 @@ function bindCommands(container: Container): void {
             [
                 TOKENS.commands.start,
                 TOKENS.commands.add,
-                TOKENS.commands.reset,
+                TOKENS.commands.recycle,
                 TOKENS.commands.balance,
                 TOKENS.commands.history
             ].map(token => container.get(token))
