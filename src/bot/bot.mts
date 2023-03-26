@@ -1,19 +1,18 @@
-import { Telegraf } from "telegraf";
+import { Context, Telegraf } from "telegraf";
 import { ConfigService } from "../services/config.service.mjs";
-import { BotContext } from "./context.mjs";
 import { Middleware } from "./middlewares/middleware.types.js";
 import { Command } from "./commands/command.mjs";
 
 export class Bot {
-    private readonly bot: Telegraf<BotContext>;
+    private readonly bot: Telegraf<Context>;
 
     public constructor(
-        private readonly configService: ConfigService,
+        private readonly config: ConfigService,
         private readonly commands: Command[],
-        middlewares: Middleware[]
+        private readonly middlewares: Middleware[]
     ) {
-        this.bot = new Telegraf<BotContext>(this.configService.get("TOKEN"));
-        middlewares.forEach(middleware => this.bot.use(middleware.create()));
+        this.bot = new Telegraf<Context>(this.config.get("TOKEN"));
+        this.middlewares.forEach(middleware => this.bot.use(middleware.create()));
     }
 
     public async init(): Promise<void> {

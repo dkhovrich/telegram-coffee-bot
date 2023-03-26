@@ -1,34 +1,11 @@
-import { Telegraf } from "telegraf";
-import { BotContext, Session } from "../context.mjs";
-
-export const enum CommandType {
-    Start = "start",
-    Add = "add",
-    Reset = "reset",
-    Balance = "balance",
-    History = "history"
-}
+import { Context, Telegraf } from "telegraf";
 
 export abstract class Command {
-    protected bot!: Telegraf<BotContext>;
+    protected bot!: Telegraf<Context>;
 
-    abstract get type(): CommandType;
-
-    public setBot(bot: Telegraf<BotContext>): void {
+    public setBot(bot: Telegraf<Context>): void {
         this.bot = bot;
     }
 
     public abstract handle(): void;
-
-    protected setCommandState(session: Session): void {
-        session.commandState = this.type;
-    }
-
-    protected clearCommandState(session: Session): void {
-        session.commandState = null;
-    }
-
-    protected isProcessingCommand(session: Session): boolean {
-        return session.commandState === this.type;
-    }
 }

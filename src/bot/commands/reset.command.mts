@@ -1,12 +1,8 @@
-import { Command, CommandType } from "./command.mjs";
+import { Command } from "./command.mjs";
 
 export class ResetCommand extends Command {
-    get type(): CommandType {
-        return CommandType.Reset;
-    }
-
     public handle(): void {
-        this.bot.command(CommandType.Reset, ctx => {
+        this.bot.command("reset", ctx => {
             ctx.reply("RESET");
         });
     }

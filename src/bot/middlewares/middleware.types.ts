@@ -1,6 +1,5 @@
-import { Middleware as TelegrafMiddleware } from "telegraf";
-import { BotContext } from "../context.mjs";
+import { Context, Middleware as TelegrafMiddleware } from "telegraf";
 
 export interface Middleware {
-    create(): TelegrafMiddleware<BotContext>;
+    create(): TelegrafMiddleware<Context>;
 }

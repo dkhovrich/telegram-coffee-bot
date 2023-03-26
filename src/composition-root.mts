@@ -10,10 +10,12 @@ import { AddCommand } from "./bot/commands/add.command.mjs";
 import { ResetCommand } from "./bot/commands/reset.command.mjs";
 import { BalanceCommand } from "./bot/commands/balance.command.mjs";
 import { HistoryCommand } from "./bot/commands/history.command.mjs";
+import { StorageService, StorageServiceImpl } from "./services/storage.service.mjs";
 
 export const TOKENS = {
     configService: token<ConfigService>("config"),
     bot: token<Bot>("bot"),
+    storageService: token<StorageService>("storage"),
     middlewares: {
         session: token<Middleware>("middleware.session"),
         auth: token<Middleware>("middleware.auth"),
@@ -39,9 +41,15 @@ function bindMiddlewares(container: Container): void {
 
 function bindCommands(container: Container): void {
     container.bind(TOKENS.commands.start).toInstance(StartCommand).inSingletonScope();
+
+    injected(AddCommand, TOKENS.storageService);
     container.bind(TOKENS.commands.add).toInstance(AddCommand).inSingletonScope();
+
     container.bind(TOKENS.commands.reset).toInstance(ResetCommand).inSingletonScope();
+
+    injected(BalanceCommand, TOKENS.storageService);
     container.bind(TOKENS.commands.balance).toInstance(BalanceCommand).inSingletonScope();
+
     container.bind(TOKENS.commands.history).toInstance(HistoryCommand).inSingletonScope();
     container
         .bind(TOKENS.commands.all)
@@ -58,11 +66,11 @@ function bindCommands(container: Container): void {
 
 export function createContainer(): Container {
     const container = new Container();
+    container.bind(TOKENS.configService).toInstance(ConfigServiceImpl).inSingletonScope();
+    container.bind(TOKENS.storageService).toInstance(StorageServiceImpl).inSingletonScope();
 
     bindMiddlewares(container);
     bindCommands(container);
-
-    container.bind(TOKENS.configService).toInstance(ConfigServiceImpl).inSingletonScope();
 
     injected(Bot, TOKENS.configService, TOKENS.commands.all, TOKENS.middlewares.all);
     container.bind(TOKENS.bot).toInstance(Bot).inSingletonScope();

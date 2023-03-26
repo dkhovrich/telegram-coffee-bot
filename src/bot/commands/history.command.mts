@@ -1,12 +1,8 @@
-import { Command, CommandType } from "./command.mjs";
+import { Command } from "./command.mjs";
 
 export class HistoryCommand extends Command {
-    get type(): CommandType {
-        return CommandType.History;
-    }
-
     public handle(): void {
-        this.bot.command(CommandType.History, ctx => {
+        this.bot.command("history", ctx => {
             ctx.reply("HISTORY");
         });
     }
