@@ -4,6 +4,11 @@ import { StorageRepository } from "./storage.repository.mjs";
 export class StorageServiceImpl implements StorageService {
     public constructor(private readonly repository: StorageRepository) {}
 
+    public async init(): Promise<void> {
+        console.log("Init storage");
+        await this.repository.createTable();
+    }
+
     public async get(): Promise<number> {
         const transaction = await this.repository.getLastTransaction();
         return transaction?.capsules ?? 0;

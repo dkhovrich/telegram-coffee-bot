@@ -20,28 +20,48 @@ export type AddTransactionModel = Omit<Transaction, "id" | "created_at">;
 export class StorageRepository {
     public constructor(private readonly config: ConfigService) {}
 
+    public async createTable(): Promise<void> {
+        const sql = `
+CREATE TABLE IF NOT EXISTS transactions 
+  ( 
+     id         INT NOT NULL AUTO_INCREMENT, 
+     type       VARCHAR(255) NOT NULL, 
+     amount     INT NOT NULL, 
+     capsules   INT NOT NULL, 
+     user       VARCHAR(255) NOT NULL, 
+     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, 
+     PRIMARY KEY (id),
+     INDEX created_at_index (created_at)
+  ) `;
+        await this.query(async connection => {
+            await connection.query(sql);
+        });
+    }
+
     public async getLastTransaction(): Promise<Transaction | null> {
-        const sql = "SELECT * FROM transactions ORDER BY created_at DESC LIMIT 1";
-        const connection = await this.createConnection();
-        const [rows] = await connection.query(sql);
-        const parsed = transactions.parse(rows);
-        const transaction = parsed.at(0) ?? null;
-        await connection.end();
-        return transaction;
+        return await this.query(async connection => {
+            const [rows] = await connection.query("SELECT * FROM transactions ORDER BY created_at DESC LIMIT 1");
+            const parsed = transactions.parse(rows);
+            return parsed.at(0) ?? null;
+        });
     }
 
     public async addTransaction(transaction: AddTransactionModel): Promise<void> {
-        const connection = await this.createConnection();
-        await connection.query("INSERT INTO transactions SET ?", transaction);
-        await connection.end();
+        await this.query(connection => connection.query("INSERT INTO transactions SET ?", transaction));
     }
-
-    private createConnection(): Promise<Connection> {
-        return mysql.createConnection({
-            host: this.config.get("DB_HOST"),
-            user: this.config.get("DB_USER"),
-            password: this.config.get("DB_PASSWORD"),
-            database: this.config.get("DB_NAME")
-        });
+    private async query<T>(fn: (connection: Connection) => Promise<T>): Promise<T> {
+        let connection: Connection | null = null;
+        try {
+            connection = await mysql.createConnection({
+                host: this.config.get("DB_HOST"),
+                user: this.config.get("DB_USER"),
+                password: this.config.get("DB_PASSWORD"),
+                database: this.config.get("DB_NAME")
+            });
+            return fn(connection);
+        } catch (error) {
+            await connection?.end();
+            throw error;
+        }
     }
 }

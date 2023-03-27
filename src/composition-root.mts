@@ -81,7 +81,7 @@ export function createContainer(): Container {
     bindMiddlewares(container);
     bindCommands(container);
 
-    injected(Bot, TOKENS.configService, TOKENS.commands.all, TOKENS.middlewares.all);
+    injected(Bot, TOKENS.configService, TOKENS.storageService, TOKENS.commands.all, TOKENS.middlewares.all);
     container.bind(TOKENS.bot).toInstance(Bot).inSingletonScope();
 
     return container;
