@@ -1,19 +1,6 @@
 import mysql, { Connection } from "mysql2/promise";
-import z from "zod";
 import { ConfigService } from "../services/config.service.mjs";
-
-const transaction = z.object({
-    id: z.number(),
-    type: z.union([z.literal("add"), z.literal("recycle")]),
-    amount: z.number(),
-    capsules: z.number(),
-    user: z.string(),
-    createdAt: z.date()
-});
-
-const transactions = z.array(transaction);
-
-export type Transaction = z.infer<typeof transaction>;
+import { Transaction, transactions } from "./storage.types.mjs";
 
 export type AddTransactionModel = Omit<Transaction, "id" | "createdAt">;
 
