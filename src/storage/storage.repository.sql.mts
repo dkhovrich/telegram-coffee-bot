@@ -1,23 +1,23 @@
 import mysql, { Connection } from "mysql2/promise";
+import { v4 } from "uuid";
 import { ConfigService } from "../services/config.service.mjs";
-import { Transaction, transactions } from "./storage.types.mjs";
+import { StorageRepository, Transaction, transactionsScheme } from "./storage.types.mjs";
 
 export type AddTransactionModel = Omit<Transaction, "id" | "createdAt">;
 
-export class StorageRepository {
+export class StorageRepositorySql implements StorageRepository {
     public constructor(private readonly config: ConfigService) {}
 
-    public async createTable(): Promise<void> {
+    public async init(): Promise<void> {
         const sql = `
 CREATE TABLE IF NOT EXISTS transactions 
   ( 
-     id         INT NOT NULL AUTO_INCREMENT, 
+     id         VARCHAR(255) NOT NULL PRIMARY KEY, 
      type       VARCHAR(255) NOT NULL, 
      amount     INT NOT NULL, 
      capsules   INT NOT NULL, 
      user       VARCHAR(255) NOT NULL, 
-     createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, 
-     PRIMARY KEY (id),
+     createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
      INDEX created_at_index (createdAt)
   ) `;
         await this.query(async connection => {
@@ -28,14 +28,17 @@ CREATE TABLE IF NOT EXISTS transactions
     public async getLastTransaction(): Promise<Transaction | null> {
         return await this.query(async connection => {
             const [rows] = await connection.query("SELECT * FROM transactions ORDER BY createdAt DESC LIMIT 1");
-            const parsed = transactions.parse(rows);
+            const parsed = transactionsScheme.parse(rows);
             return parsed.at(0) ?? null;
         });
     }
 
     public async addTransaction(transaction: AddTransactionModel): Promise<void> {
-        await this.query(connection => connection.query("INSERT INTO transactions SET ?", transaction));
+        await this.query(connection =>
+            connection.query("INSERT INTO transactions SET ?", { id: v4(), ...transaction })
+        );
     }
+
     private async query<T>(fn: (connection: Connection) => Promise<T>): Promise<T> {
         let connection: Connection | null = null;
         try {

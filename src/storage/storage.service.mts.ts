@@ -1,12 +1,11 @@
-import { StorageService } from "./storage.types.mjs";
-import { StorageRepository } from "./storage.repository.mjs";
+import { StorageRepository, StorageService } from "./storage.types.mjs";
 
 export class StorageServiceImpl implements StorageService {
     public constructor(private readonly repository: StorageRepository) {}
 
     public async init(): Promise<void> {
         console.log("Init storage");
-        await this.repository.createTable();
+        await this.repository.init();
     }
 
     public async get(): Promise<number> {

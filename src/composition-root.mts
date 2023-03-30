@@ -10,9 +10,10 @@ import { AddCommand } from "./bot/commands/add.command.mjs";
 import { RecycleCommand } from "./bot/commands/recycle.command.mjs";
 import { BalanceCommand } from "./bot/commands/balance.command.mjs";
 import { HistoryCommand } from "./bot/commands/history.command.mjs";
-import { StorageService } from "./storage/storage.types.mjs";
+import { StorageRepository, StorageService } from "./storage/storage.types.mjs";
 import { StorageServiceImpl } from "./storage/storage.service.mts.js";
-import { StorageRepository } from "./storage/storage.repository.mjs";
+import { StorageRepositoryFirebase } from "./storage/storage.repository.firebase.mjs";
+import { StorageRepositorySql } from "./storage/storage.repository.sql.mjs";
 
 export const TOKENS = {
     configService: token<ConfigService>("config"),
@@ -75,8 +76,13 @@ export function createContainer(): Container {
         .toInstance(process.env["NODE_ENV"] === "development" ? ConfigServiceDevImpl : ConfigServiceProdImpl)
         .inSingletonScope();
 
-    injected(StorageRepository, TOKENS.configService);
-    container.bind(TOKENS.storageRepository).toInstance(StorageRepository).inSingletonScope();
+    if (process.env["STORAGE_TYPE"] === "sql") {
+        injected(StorageRepositorySql, TOKENS.configService);
+        container.bind(TOKENS.storageRepository).toInstance(StorageRepositorySql).inSingletonScope();
+    } else {
+        injected(StorageRepositoryFirebase, TOKENS.configService);
+        container.bind(TOKENS.storageRepository).toInstance(StorageRepositoryFirebase).inSingletonScope();
+    }
 
     injected(StorageServiceImpl, TOKENS.storageRepository);
     container.bind(TOKENS.storageService).toInstance(StorageServiceImpl).inSingletonScope();
