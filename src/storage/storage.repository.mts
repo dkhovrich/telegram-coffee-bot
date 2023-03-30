@@ -8,14 +8,14 @@ const transaction = z.object({
     amount: z.number(),
     capsules: z.number(),
     user: z.string(),
-    created_at: z.date()
+    createdAt: z.date()
 });
 
 const transactions = z.array(transaction);
 
 export type Transaction = z.infer<typeof transaction>;
 
-export type AddTransactionModel = Omit<Transaction, "id" | "created_at">;
+export type AddTransactionModel = Omit<Transaction, "id" | "createdAt">;
 
 export class StorageRepository {
     public constructor(private readonly config: ConfigService) {}
@@ -29,9 +29,9 @@ CREATE TABLE IF NOT EXISTS transactions
      amount     INT NOT NULL, 
      capsules   INT NOT NULL, 
      user       VARCHAR(255) NOT NULL, 
-     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, 
+     createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, 
      PRIMARY KEY (id),
-     INDEX created_at_index (created_at)
+     INDEX created_at_index (createdAt)
   ) `;
         await this.query(async connection => {
             await connection.query(sql);
@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS transactions
 
     public async getLastTransaction(): Promise<Transaction | null> {
         return await this.query(async connection => {
-            const [rows] = await connection.query("SELECT * FROM transactions ORDER BY created_at DESC LIMIT 1");
+            const [rows] = await connection.query("SELECT * FROM transactions ORDER BY createdAt DESC LIMIT 1");
             const parsed = transactions.parse(rows);
             return parsed.at(0) ?? null;
         });
