@@ -43,10 +43,10 @@ CREATE TABLE IF NOT EXISTS transactions
         let connection: Connection | null = null;
         try {
             connection = await mysql.createConnection({
-                host: this.config.get("DB_HOST"),
-                user: this.config.get("DB_USER"),
-                password: this.config.get("DB_PASSWORD"),
-                database: this.config.get("DB_NAME")
+                host: this.config.get("SQL_DATABASE_HOST"),
+                user: this.config.get("SQL_DATABASE_USER"),
+                password: this.config.get("SQL_DATABASE_PASSWORD"),
+                database: this.config.get("SQL_DATABASE_NAME")
             });
             return fn(connection);
         } catch (error) {
