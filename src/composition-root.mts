@@ -9,7 +9,6 @@ import { AuthMiddleware } from "./bot/middlewares/auth.middleware.mjs";
 import { AddCommand } from "./bot/commands/add.command.mjs";
 import { RecycleCommand } from "./bot/commands/recycle.command.mjs";
 import { BalanceCommand } from "./bot/commands/balance.command.mjs";
-import { HistoryCommand } from "./bot/commands/history.command.mjs";
 import { StorageRepository, StorageService } from "./storage/storage.types.mjs";
 import { StorageServiceImpl } from "./storage/storage.service.mts.js";
 import { StorageRepositoryFirebase } from "./storage/storage.repository.firebase.mjs";
@@ -30,7 +29,6 @@ export const TOKENS = {
         add: token<Command>("command.add"),
         recycle: token<Command>("command.recycle"),
         balance: token<Command>("command.balance"),
-        history: token<Command>("command.history"),
         all: token<Command[]>("commands")
     }
 };
@@ -56,17 +54,12 @@ function bindCommands(container: Container): void {
     injected(BalanceCommand, TOKENS.storageService);
     container.bind(TOKENS.commands.balance).toInstance(BalanceCommand).inSingletonScope();
 
-    container.bind(TOKENS.commands.history).toInstance(HistoryCommand).inSingletonScope();
     container
         .bind(TOKENS.commands.all)
         .toConstant(
-            [
-                TOKENS.commands.start,
-                TOKENS.commands.add,
-                TOKENS.commands.recycle,
-                TOKENS.commands.balance,
-                TOKENS.commands.history
-            ].map(token => container.get(token))
+            [TOKENS.commands.start, TOKENS.commands.add, TOKENS.commands.recycle, TOKENS.commands.balance].map(token =>
+                container.get(token)
+            )
         );
 }
 
