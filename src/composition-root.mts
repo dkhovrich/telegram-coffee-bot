@@ -36,6 +36,7 @@ export const TOKENS = {
 };
 
 function bindMiddlewares(container: Container): void {
+    injected(AuthMiddleware, TOKENS.configService);
     container.bind(TOKENS.middlewares.auth).toInstance(AuthMiddleware).inSingletonScope();
     container.bind(TOKENS.middlewares.session).toInstance(SessionMiddleware).inSingletonScope();
     container

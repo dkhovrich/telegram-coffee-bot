@@ -1,8 +1,13 @@
 import { Context, Middleware as TelegrafMiddleware } from "telegraf";
 import { Middleware } from "./middleware.types.mjs";
+import { ConfigService } from "../../services/config.service.mjs";
 
 export class AuthMiddleware implements Middleware {
-    private readonly allowedUsers = [];
+    private readonly allowedUsers: string[];
+
+    public constructor(config: ConfigService) {
+        this.allowedUsers = config.get("ALLOWED_USERS").split(",");
+    }
 
     create(): TelegrafMiddleware<Context> {
         return async (ctx, next) => {
