@@ -31,8 +31,8 @@ export class RecycleCommand extends Command {
 
     private handleConfirmationActions(): void {
         this.bot.action(this.confirmButtonId, async ctx => {
-            if (ctx.from?.username == null) return;
-            await this.storage.recycle(ctx.from.username);
+            if (ctx.from == null) return;
+            await this.storage.recycle(ctx.from.username ?? ctx.from.first_name);
             ctx.editMessageText("All your capsules have been recycled! ♻️");
         });
 
