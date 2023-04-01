@@ -13,9 +13,11 @@ import { StorageRepository, StorageService } from "./storage/storage.types.mjs";
 import { StorageServiceImpl } from "./storage/storage.service.mts.js";
 import { StorageRepositoryFirebase } from "./storage/storage.repository.firebase.mjs";
 import { StorageRepositorySql } from "./storage/storage.repository.sql.mjs";
+import { UsersService, UsersServiceImpl } from "./services/users-service.js";
 
 export const TOKENS = {
-    configService: token<ConfigService>("config"),
+    configService: token<ConfigService>("config.service"),
+    usersService: token<UsersService>("users.service"),
     bot: token<Bot>("bot"),
     storageRepository: token<StorageRepository>("storage.repository"),
     storageService: token<StorageService>("storage"),
@@ -34,7 +36,7 @@ export const TOKENS = {
 };
 
 function bindMiddlewares(container: Container): void {
-    injected(AuthMiddleware, TOKENS.configService);
+    injected(AuthMiddleware, TOKENS.usersService);
     container.bind(TOKENS.middlewares.auth).toInstance(AuthMiddleware).inSingletonScope();
     container.bind(TOKENS.middlewares.session).toInstance(SessionMiddleware).inSingletonScope();
     container
@@ -69,6 +71,9 @@ export function createContainer(): Container {
         .bind(TOKENS.configService)
         .toInstance(process.env["NODE_ENV"] === "development" ? ConfigServiceDevImpl : ConfigServiceProdImpl)
         .inSingletonScope();
+
+    injected(UsersServiceImpl, TOKENS.configService);
+    container.bind(TOKENS.usersService).toInstance(UsersServiceImpl).inSingletonScope();
 
     if (process.env["STORAGE_TYPE"] === "sql") {
         injected(StorageRepositorySql, TOKENS.configService);
