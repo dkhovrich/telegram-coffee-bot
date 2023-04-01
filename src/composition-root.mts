@@ -47,7 +47,7 @@ function bindMiddlewares(container: Container): void {
 function bindCommands(container: Container): void {
     container.bind(TOKENS.commands.start).toInstance(StartCommand).inSingletonScope();
 
-    injected(AddCommand, TOKENS.storageService);
+    injected(AddCommand, TOKENS.storageService, TOKENS.usersService);
     container.bind(TOKENS.commands.add).toInstance(AddCommand).inSingletonScope();
 
     injected(RecycleCommand, TOKENS.storageService);

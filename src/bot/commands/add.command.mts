@@ -3,14 +3,16 @@ import { Command } from "./command.mjs";
 import { StorageService } from "../../storage/storage.types.mjs";
 import { Markup, Scenes } from "telegraf";
 import { message } from "telegraf/filters";
+import { UsersService } from "../../services/users-service.js";
+import { getUserData } from "./utils.js";
 
 export class AddCommand extends Command {
     private static readonly QUESTION_ID = "QUESTION_ID";
-    private static readonly CONFIRM_BUTTON_ID = "CONFIRM_BUTTON_ID";
-    private static readonly CANCEL_BUTTON_ID = "CANCEL_BUTTON_ID";
+    private static readonly CONFIRM_BUTTON_ID = "ADD_CONFIRM_BUTTON_ID";
+    private static readonly CANCEL_BUTTON_ID = "ADD_CANCEL_BUTTON_ID";
     private value: number | null = null;
 
-    public constructor(private readonly storage: StorageService) {
+    public constructor(private readonly storage: StorageService, private readonly usersService: UsersService) {
         super();
     }
 
@@ -61,13 +63,29 @@ export class AddCommand extends Command {
     private handleConfirmationActions(): void {
         this.bot.action(AddCommand.CONFIRM_BUTTON_ID, async ctx => {
             if (this.value == null || ctx.from == null) return;
-            const amount = await this.storage.add(this.value, ctx.from.username ?? ctx.from.first_name);
-            const text = `${this.value > 0 ? "Added" : "Removed"} ${this.value} capsules. Total amount: ${amount}`;
-            ctx.editMessageText(text);
+
+            const user = getUserData(ctx.from);
+            const amount = await this.storage.add(this.value, user.name);
+            ctx.editMessageText(AddCommand.getConfirmationResponseText(this.value, amount));
+
+            const notificationText = AddCommand.getConfirmationNotificationText(user.displayName, this.value, amount);
+            await Promise.all(
+                this.usersService.users
+                    .filter(id => id !== user.id)
+                    .map(id => this.bot.telegram.sendMessage(id, notificationText))
+            );
         });
 
         this.bot.action(AddCommand.CANCEL_BUTTON_ID, ctx => {
             ctx.editMessageText("Okay, come back with capsules later! ☕️");
         });
+    }
+
+    private static getConfirmationResponseText(value: number, amount: number): string {
+        return `${value > 0 ? "Added" : "Removed"} ${Math.abs(value)} capsules. Total amount: ${amount}`;
+    }
+
+    private static getConfirmationNotificationText(user: string, value: number, amount: number): string {
+        return `🫡 ${user} has ${value > 0 ? "added" : "removed"} ${Math.abs(value)} capsules.\nTotal amount: ${amount}`;
     }
 }
