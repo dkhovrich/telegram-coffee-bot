@@ -37,7 +37,7 @@ export class AddCommand extends Command {
 
         question.enter(async ctx => {
             this.value = null;
-            await ctx.reply("☕️How many capsules would you like to add??️");
+            await ctx.reply("☕️How many capsules would you like to add?");
         });
 
         question.on(message("text"), async ctx => {
