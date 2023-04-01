@@ -22,7 +22,7 @@ export class RecycleCommand extends Command {
         this.bot.command("recycle", async ctx => {
             const amount = await this.storage.get();
             if (amount < RecycleCommand.MIN_RECYCLE_AMOUNT) {
-                ctx.reply("🤷You don't have enough capsules to recycle!!️");
+                ctx.reply("🤷You don't have enough capsules to recycle");
                 return;
             }
             ctx.reply(

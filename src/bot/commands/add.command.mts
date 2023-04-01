@@ -78,15 +78,15 @@ export class AddCommand extends Command {
         });
 
         this.bot.action(AddCommand.CANCEL_BUTTON_ID, ctx => {
-            ctx.editMessageText("🥲️Okay, come back with capsules later ");
+            ctx.editMessageText("🥲️Okay, come back with capsules later");
         });
     }
 
     private static getConfirmationResponseText(value: number, amount: number): string {
-        return `🫡${value > 0 ? "Added" : "Removed"} ${Math.abs(value)} capsules. Total amount: ${amount}`;
+        return `🫡${value > 0 ? "Added" : "Removed"} ${Math.abs(value)} capsules.\nTotal amount: ${amount}`;
     }
 
     private static getConfirmationNotificationText(user: string, value: number, amount: number): string {
-        return ` 🫡${user} has ${value > 0 ? "added" : "removed"} ${Math.abs(value)} capsules\nTotal amount: ${amount}`;
+        return ` 🫡${user} has ${value > 0 ? "added" : "removed"} ${Math.abs(value)} capsules.\nTotal amount: ${amount}`;
     }
 }
