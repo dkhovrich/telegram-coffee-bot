@@ -15,12 +15,16 @@ import { StorageRepositoryFirebase } from "./storage/storage.repository.firebase
 import { StorageRepositorySql } from "./storage/storage.repository.sql.mjs";
 import { UsersService, UsersServiceImpl } from "./services/users.service.mjs";
 import { NotificationService, NotificationServiceImpl } from "./services/notification.service.mjs";
+import { BotProvider, BotProviderImpl } from "./bot/bot.provider.mjs";
 
 export const TOKENS = {
     configService: token<ConfigService>("config.service"),
     usersService: token<UsersService>("users.service"),
     notificationService: token<NotificationService>("notification.service"),
-    bot: token<Bot>("bot"),
+    bot: {
+        instance: token<Bot>("bot.instance"),
+        provider: token<BotProvider>("bot.provider")
+    },
     storageRepository: token<StorageRepository>("storage.repository"),
     storageService: token<StorageService>("storage"),
     middlewares: {
@@ -47,15 +51,16 @@ function bindMiddlewares(container: Container): void {
 }
 
 function bindCommands(container: Container): void {
+    injected(StartCommand, TOKENS.bot.provider);
     container.bind(TOKENS.commands.start).toInstance(StartCommand).inSingletonScope();
 
-    injected(AddCommand, TOKENS.storageService, TOKENS.notificationService);
+    injected(AddCommand, TOKENS.bot.provider, TOKENS.storageService, TOKENS.notificationService);
     container.bind(TOKENS.commands.add).toInstance(AddCommand).inSingletonScope();
 
-    injected(RecycleCommand, TOKENS.storageService, TOKENS.notificationService);
+    injected(RecycleCommand, TOKENS.bot.provider, TOKENS.storageService, TOKENS.notificationService);
     container.bind(TOKENS.commands.recycle).toInstance(RecycleCommand).inSingletonScope();
 
-    injected(BalanceCommand, TOKENS.storageService);
+    injected(BalanceCommand, TOKENS.bot.provider, TOKENS.storageService);
     container.bind(TOKENS.commands.balance).toInstance(BalanceCommand).inSingletonScope();
 
     container
@@ -69,6 +74,8 @@ function bindCommands(container: Container): void {
 
 export function createContainer(): Container {
     const container = new Container();
+
+    container.bind(TOKENS.bot.provider).toInstance(BotProviderImpl).inSingletonScope();
     container
         .bind(TOKENS.configService)
         .toInstance(process.env["NODE_ENV"] === "development" ? ConfigServiceDevImpl : ConfigServiceProdImpl)
@@ -77,7 +84,7 @@ export function createContainer(): Container {
     injected(UsersServiceImpl, TOKENS.configService);
     container.bind(TOKENS.usersService).toInstance(UsersServiceImpl).inSingletonScope();
 
-    injected(NotificationServiceImpl, TOKENS.usersService);
+    injected(NotificationServiceImpl, TOKENS.usersService, TOKENS.bot.provider);
     container.bind(TOKENS.notificationService).toInstance(NotificationServiceImpl).inSingletonScope();
 
     if (process.env["STORAGE_TYPE"] === "sql") {
@@ -94,8 +101,15 @@ export function createContainer(): Container {
     bindMiddlewares(container);
     bindCommands(container);
 
-    injected(Bot, TOKENS.configService, TOKENS.storageService, TOKENS.commands.all, TOKENS.middlewares.all);
-    container.bind(TOKENS.bot).toInstance(Bot).inSingletonScope();
+    injected(
+        Bot,
+        TOKENS.bot.provider,
+        TOKENS.configService,
+        TOKENS.storageService,
+        TOKENS.commands.all,
+        TOKENS.middlewares.all
+    );
+    container.bind(TOKENS.bot.instance).toInstance(Bot).inSingletonScope();
 
     return container;
 }

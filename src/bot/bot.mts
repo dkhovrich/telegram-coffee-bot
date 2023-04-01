@@ -3,11 +3,13 @@ import { ConfigService } from "../services/config.service.mjs";
 import { Middleware } from "./middlewares/middleware.types.mjs";
 import { Command } from "./commands/command.mjs";
 import { StorageService } from "../storage/storage.types.mjs";
+import { BotProvider } from "./bot.provider.mjs";
 
 export class Bot {
     private readonly bot: Telegraf<Context>;
 
     public constructor(
+        private readonly provider: BotProvider,
         private readonly config: ConfigService,
         private readonly storage: StorageService,
         private readonly commands: Command[],
@@ -22,7 +24,7 @@ export class Bot {
             await this.storage.init();
 
             for (const command of this.commands) {
-                command.setBot(this.bot);
+                this.provider.bot = this.bot;
                 command.handle();
             }
 

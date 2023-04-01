@@ -5,6 +5,7 @@ import { Markup, Scenes } from "telegraf";
 import { message } from "telegraf/filters";
 import { getUserData } from "./utils.mjs";
 import { NotificationService } from "../../services/notification.service.mjs";
+import { BotProvider } from "../bot.provider.mjs";
 
 export class AddCommand extends Command {
     private static readonly QUESTION_ID = "QUESTION_ID";
@@ -13,10 +14,11 @@ export class AddCommand extends Command {
     private value: number | null = null;
 
     public constructor(
+        provider: BotProvider,
         private readonly storage: StorageService,
         private readonly notificationService: NotificationService
     ) {
-        super();
+        super(provider);
     }
 
     public handle(): void {
@@ -72,7 +74,7 @@ export class AddCommand extends Command {
             ctx.editMessageText(AddCommand.getConfirmationResponseText(this.value, amount));
 
             const notificationText = AddCommand.getConfirmationNotificationText(user.displayName, this.value, amount);
-            await this.notificationService.notifyAll(this.bot, user.id, notificationText);
+            await this.notificationService.notifyAll(user.id, notificationText);
         });
 
         this.bot.action(AddCommand.CANCEL_BUTTON_ID, ctx => {
