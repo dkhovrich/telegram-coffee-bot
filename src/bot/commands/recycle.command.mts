@@ -1,13 +1,18 @@
 import { Command } from "./command.mjs";
 import { Markup } from "telegraf";
 import { StorageService } from "../../storage/storage.types.mjs";
+import { getUserData } from "./utils.mjs";
+import { NotificationService } from "../../services/notification.service.mjs";
 
 export class RecycleCommand extends Command {
-    private readonly confirmButtonId = "reset-confirm";
-    private readonly cancelButtonId = "reset-cancel";
+    private static readonly CONFIRM_BUTTON_ID = "RESET_CONFIRM_BUTTON_ID";
+    private static readonly CANCEL_BUTTON_ID = "RESET_CANCEL_BUTTON_ID";
     private static readonly MIN_RECYCLE_AMOUNT = 100;
 
-    public constructor(private readonly storage: StorageService) {
+    public constructor(
+        private readonly storage: StorageService,
+        private readonly notificationService: NotificationService
+    ) {
         super();
     }
 
@@ -21,8 +26,8 @@ export class RecycleCommand extends Command {
             ctx.reply(
                 "Are you sure you want to recycle all your capsules? 🤔",
                 Markup.inlineKeyboard([
-                    Markup.button.callback("Yes", this.confirmButtonId),
-                    Markup.button.callback("No", this.cancelButtonId)
+                    Markup.button.callback("Yes", RecycleCommand.CONFIRM_BUTTON_ID),
+                    Markup.button.callback("No", RecycleCommand.CANCEL_BUTTON_ID)
                 ])
             );
         });
@@ -30,14 +35,21 @@ export class RecycleCommand extends Command {
     }
 
     private handleConfirmationActions(): void {
-        this.bot.action(this.confirmButtonId, async ctx => {
+        this.bot.action(RecycleCommand.CONFIRM_BUTTON_ID, async ctx => {
             if (ctx.from == null) return;
-            await this.storage.recycle(ctx.from.username ?? ctx.from.first_name);
-            ctx.editMessageText("All your capsules have been recycled! ♻️");
+
+            const user = getUserData(ctx.from);
+            await this.storage.recycle(user.name);
+            ctx.editMessageText("All capsules have been recycled 🌱");
+            await this.notificationService.notifyAll(
+                this.bot,
+                user.id,
+                `${user.displayName} has recycled all capsules 🌱`
+            );
         });
 
-        this.bot.action(this.cancelButtonId, async ctx => {
-            ctx.editMessageText("Okay, come back with capsules later! ☕️");
+        this.bot.action(RecycleCommand.CANCEL_BUTTON_ID, async ctx => {
+            ctx.editMessageText("Okay, come back with capsules later ☕️");
         });
     }
 }

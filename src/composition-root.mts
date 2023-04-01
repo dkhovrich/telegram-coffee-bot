@@ -52,7 +52,7 @@ function bindCommands(container: Container): void {
     injected(AddCommand, TOKENS.storageService, TOKENS.notificationService);
     container.bind(TOKENS.commands.add).toInstance(AddCommand).inSingletonScope();
 
-    injected(RecycleCommand, TOKENS.storageService);
+    injected(RecycleCommand, TOKENS.storageService, TOKENS.notificationService);
     container.bind(TOKENS.commands.recycle).toInstance(RecycleCommand).inSingletonScope();
 
     injected(BalanceCommand, TOKENS.storageService);
