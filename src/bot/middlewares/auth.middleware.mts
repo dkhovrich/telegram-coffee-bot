@@ -1,6 +1,6 @@
 import { Context, Middleware as TelegrafMiddleware } from "telegraf";
 import { Middleware } from "./middleware.types.mjs";
-import { UsersService } from "../../services/users-service.mjs";
+import { UsersService } from "../../services/users.service.mjs";
 
 export class AuthMiddleware implements Middleware {
     public constructor(private readonly usersService: UsersService) {}

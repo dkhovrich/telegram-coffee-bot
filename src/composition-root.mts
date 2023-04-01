@@ -13,7 +13,7 @@ import { StorageRepository, StorageService } from "./storage/storage.types.mjs";
 import { StorageServiceImpl } from "./storage/storage.service.mts.js";
 import { StorageRepositoryFirebase } from "./storage/storage.repository.firebase.mjs";
 import { StorageRepositorySql } from "./storage/storage.repository.sql.mjs";
-import { UsersService, UsersServiceImpl } from "./services/users-service.mjs";
+import { UsersService, UsersServiceImpl } from "./services/users.service.mjs";
 
 export const TOKENS = {
     configService: token<ConfigService>("config.service"),
