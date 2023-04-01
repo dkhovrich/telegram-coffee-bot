@@ -37,13 +37,13 @@ export class AddCommand extends Command {
 
         question.enter(async ctx => {
             this.value = null;
-            await ctx.reply("How many capsules would you like to add? ☕️");
+            await ctx.reply("☕️How many capsules would you like to add?");
         });
 
         question.on(message("text"), async ctx => {
             const result = z.coerce.number().safeParse(ctx.message.text);
             if (!result.success) {
-                ctx.reply("Invalid value. Please use /add command again ⚠️");
+                ctx.reply("⚠️Invalid value. Please use /add command again");
                 // @ts-ignore
                 ctx.scene.leave();
                 return;
@@ -51,7 +51,7 @@ export class AddCommand extends Command {
 
             this.value = result.data;
             ctx.reply(
-                `Are you sure you want to ${this.value > 0 ? "add" : "remove"} ${Math.abs(this.value)} capsules? 🤔`,
+                `🤔Are you sure you want to ${this.value > 0 ? "add" : "remove"} ${Math.abs(this.value)} capsules?`,
                 Markup.inlineKeyboard([
                     Markup.button.callback("Yes", AddCommand.CONFIRM_BUTTON_ID),
                     Markup.button.callback("No", AddCommand.CANCEL_BUTTON_ID)
@@ -78,15 +78,15 @@ export class AddCommand extends Command {
         });
 
         this.bot.action(AddCommand.CANCEL_BUTTON_ID, ctx => {
-            ctx.editMessageText("Okay, come back with capsules later ☕️");
+            ctx.editMessageText("🥲️Okay, come back with capsules later ");
         });
     }
 
     private static getConfirmationResponseText(value: number, amount: number): string {
-        return `${value > 0 ? "Added" : "Removed"} ${Math.abs(value)} capsules. Total amount: ${amount}`;
+        return `🫡${value > 0 ? "Added" : "Removed"} ${Math.abs(value)} capsules. Total amount: ${amount}`;
     }
 
     private static getConfirmationNotificationText(user: string, value: number, amount: number): string {
-        return `${user} has ${value > 0 ? "added" : "removed"} ${Math.abs(value)} capsules 🫡\nTotal amount: ${amount}`;
+        return ` 🫡${user} has ${value > 0 ? "added" : "removed"} ${Math.abs(value)} capsules\nTotal amount: ${amount}`;
     }
 }

@@ -22,11 +22,11 @@ export class RecycleCommand extends Command {
         this.bot.command("recycle", async ctx => {
             const amount = await this.storage.get();
             if (amount < RecycleCommand.MIN_RECYCLE_AMOUNT) {
-                ctx.reply("You don't have enough capsules to recycle! ♻️");
+                ctx.reply("🤷You don't have enough capsules to recycle!!️");
                 return;
             }
             ctx.reply(
-                "Are you sure you want to recycle all your capsules? 🤔",
+                "🤔Are you sure you want to recycle all your capsules?",
                 Markup.inlineKeyboard([
                     Markup.button.callback("Yes", RecycleCommand.CONFIRM_BUTTON_ID),
                     Markup.button.callback("No", RecycleCommand.CANCEL_BUTTON_ID)
@@ -42,12 +42,12 @@ export class RecycleCommand extends Command {
 
             const user = getUserData(ctx.from);
             await this.storage.recycle(user.name);
-            ctx.editMessageText("All capsules have been recycled 🌱");
-            await this.notificationService.notifyAll(user.id, `${user.displayName} has recycled all capsules 🌱`);
+            ctx.editMessageText("🌱All capsules have been recycled");
+            await this.notificationService.notifyAll(user.id, `🌱${user.displayName} has recycled all capsules`);
         });
 
         this.bot.action(RecycleCommand.CANCEL_BUTTON_ID, async ctx => {
-            ctx.editMessageText("Okay, come back with capsules later ☕️");
+            ctx.editMessageText("☕️Okay, come back with capsules later");
         });
     }
 }
