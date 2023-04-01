@@ -7,6 +7,6 @@ export class StartCommand extends Command {
     }
 
     handle(): void {
-        this.bot.start(ctx => ctx.reply("Welcome to the Coffee Capsules Bot! ☕️"));
+        this.bot.start(ctx => ctx.reply("☕️Welcome to the Coffee Capsules Bot!!️"));
     }
 }

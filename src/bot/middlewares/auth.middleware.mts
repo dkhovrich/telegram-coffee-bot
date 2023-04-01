@@ -8,7 +8,7 @@ export class AuthMiddleware implements Middleware {
     public create(): TelegrafMiddleware<Context> {
         return async (ctx, next) => {
             if (ctx.from == null || !this.usersService.isAllowed(ctx.from.id)) {
-                await ctx.reply("You are not allowed to use this bot ⛔");
+                await ctx.reply("⛔You are not allowed to use this bot");
                 return;
             }
             await next();
