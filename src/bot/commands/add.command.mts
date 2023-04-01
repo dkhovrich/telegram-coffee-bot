@@ -3,8 +3,8 @@ import { Command } from "./command.mjs";
 import { StorageService } from "../../storage/storage.types.mjs";
 import { Markup, Scenes } from "telegraf";
 import { message } from "telegraf/filters";
-import { UsersService } from "../../services/users-service.js";
-import { getUserData } from "./utils.js";
+import { UsersService } from "../../services/users-service.mjs";
+import { getUserData } from "./utils.mjs";
 
 export class AddCommand extends Command {
     private static readonly QUESTION_ID = "QUESTION_ID";
