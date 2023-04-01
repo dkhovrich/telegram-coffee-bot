@@ -14,10 +14,12 @@ import { StorageServiceImpl } from "./storage/storage.service.mts.js";
 import { StorageRepositoryFirebase } from "./storage/storage.repository.firebase.mjs";
 import { StorageRepositorySql } from "./storage/storage.repository.sql.mjs";
 import { UsersService, UsersServiceImpl } from "./services/users.service.mjs";
+import { NotificationService, NotificationServiceImpl } from "./services/notification.service.mjs";
 
 export const TOKENS = {
     configService: token<ConfigService>("config.service"),
     usersService: token<UsersService>("users.service"),
+    notificationService: token<NotificationService>("notification.service"),
     bot: token<Bot>("bot"),
     storageRepository: token<StorageRepository>("storage.repository"),
     storageService: token<StorageService>("storage"),
@@ -47,7 +49,7 @@ function bindMiddlewares(container: Container): void {
 function bindCommands(container: Container): void {
     container.bind(TOKENS.commands.start).toInstance(StartCommand).inSingletonScope();
 
-    injected(AddCommand, TOKENS.storageService, TOKENS.usersService);
+    injected(AddCommand, TOKENS.storageService, TOKENS.notificationService);
     container.bind(TOKENS.commands.add).toInstance(AddCommand).inSingletonScope();
 
     injected(RecycleCommand, TOKENS.storageService);
@@ -74,6 +76,9 @@ export function createContainer(): Container {
 
     injected(UsersServiceImpl, TOKENS.configService);
     container.bind(TOKENS.usersService).toInstance(UsersServiceImpl).inSingletonScope();
+
+    injected(NotificationServiceImpl, TOKENS.usersService);
+    container.bind(TOKENS.notificationService).toInstance(NotificationServiceImpl).inSingletonScope();
 
     if (process.env["STORAGE_TYPE"] === "sql") {
         injected(StorageRepositorySql, TOKENS.configService);

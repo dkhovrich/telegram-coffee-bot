@@ -3,8 +3,8 @@ import { Command } from "./command.mjs";
 import { StorageService } from "../../storage/storage.types.mjs";
 import { Markup, Scenes } from "telegraf";
 import { message } from "telegraf/filters";
-import { UsersService } from "../../services/users.service.mjs";
 import { getUserData } from "./utils.mjs";
+import { NotificationService } from "../../services/notification.service.mjs";
 
 export class AddCommand extends Command {
     private static readonly QUESTION_ID = "QUESTION_ID";
@@ -12,7 +12,10 @@ export class AddCommand extends Command {
     private static readonly CANCEL_BUTTON_ID = "ADD_CANCEL_BUTTON_ID";
     private value: number | null = null;
 
-    public constructor(private readonly storage: StorageService, private readonly usersService: UsersService) {
+    public constructor(
+        private readonly storage: StorageService,
+        private readonly notificationService: NotificationService
+    ) {
         super();
     }
 
@@ -69,15 +72,11 @@ export class AddCommand extends Command {
             ctx.editMessageText(AddCommand.getConfirmationResponseText(this.value, amount));
 
             const notificationText = AddCommand.getConfirmationNotificationText(user.displayName, this.value, amount);
-            await Promise.all(
-                this.usersService.users
-                    .filter(id => id !== user.id)
-                    .map(id => this.bot.telegram.sendMessage(id, notificationText))
-            );
+            await this.notificationService.notifyAll(this.bot, user.id, notificationText);
         });
 
         this.bot.action(AddCommand.CANCEL_BUTTON_ID, ctx => {
-            ctx.editMessageText("Okay, come back with capsules later! ☕️");
+            ctx.editMessageText("Okay, come back with capsules later ☕️");
         });
     }
 
@@ -86,6 +85,6 @@ export class AddCommand extends Command {
     }
 
     private static getConfirmationNotificationText(user: string, value: number, amount: number): string {
-        return `🫡 ${user} has ${value > 0 ? "added" : "removed"} ${Math.abs(value)} capsules.\nTotal amount: ${amount}`;
+        return `${user} has ${value > 0 ? "added" : "removed"} ${Math.abs(value)} capsules 🫡\nTotal amount: ${amount}`;
     }
 }
