@@ -3,19 +3,20 @@ import { ConfigService } from "../services/config.service.mjs";
 import { Middleware } from "./middlewares/middleware.types.mjs";
 import { Command } from "./commands/command.mjs";
 import { StorageService } from "../storage/storage.types.mjs";
-import { BotProvider } from "./bot.provider.mjs";
+import { BotFactory } from "./bot.factory.types.mts.js";
 
 export class Bot {
     private readonly bot: Telegraf<Context>;
+    private readonly commands: Command[];
 
     public constructor(
-        private readonly provider: BotProvider,
+        commandsFactory: BotFactory<Command[]>,
         private readonly config: ConfigService,
         private readonly storage: StorageService,
-        private readonly commands: Command[],
         private readonly middlewares: Middleware[]
     ) {
         this.bot = new Telegraf<Context>(this.config.get("TOKEN"));
+        this.commands = commandsFactory(this.bot);
         this.middlewares.forEach(middleware => this.bot.use(middleware.create()));
     }
 
@@ -24,7 +25,6 @@ export class Bot {
             await this.storage.init();
 
             for (const command of this.commands) {
-                this.provider.bot = this.bot;
                 command.handle();
             }
 

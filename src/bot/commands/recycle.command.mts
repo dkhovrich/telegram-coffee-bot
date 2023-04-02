@@ -3,7 +3,7 @@ import { Markup } from "telegraf";
 import { StorageService } from "../../storage/storage.types.mjs";
 import { getUserData } from "./utils.mjs";
 import { NotificationService } from "../../services/notification.service.mjs";
-import { BotProvider } from "../bot.provider.mjs";
+import { BotFactory } from "../bot.factory.types.mts.js";
 
 export class RecycleCommand extends Command {
     private static readonly CONFIRM_BUTTON_ID = "RESET_CONFIRM_BUTTON_ID";
@@ -11,11 +11,10 @@ export class RecycleCommand extends Command {
     private static readonly MIN_RECYCLE_AMOUNT = 100;
 
     public constructor(
-        provider: BotProvider,
         private readonly storage: StorageService,
-        private readonly notificationService: NotificationService
+        private readonly notificationServiceFactory: BotFactory<NotificationService>
     ) {
-        super(provider);
+        super();
     }
 
     public handle(): void {
@@ -43,7 +42,10 @@ export class RecycleCommand extends Command {
             const user = getUserData(ctx.from);
             await this.storage.recycle(user.name);
             ctx.editMessageText("🌱All capsules have been recycled");
-            await this.notificationService.notifyAll(user.id, `🌱${user.displayName} has recycled all capsules`);
+            await this.notificationServiceFactory(this.bot).notifyAll(
+                user.id,
+                `🌱${user.displayName} has recycled all capsules`
+            );
         });
 
         this.bot.action(RecycleCommand.CANCEL_BUTTON_ID, async ctx => {
