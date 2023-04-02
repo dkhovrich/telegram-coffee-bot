@@ -14,5 +14,6 @@
   "recycleCommandQuestion": "\uD83E\uDD14Are you sure you want to recycle all your capsules?",
   "recycleCommandCancel": "☕\uFE0FOkay, come back with capsules later",
   "recycleCommandResponse": "\uD83C\uDF31All capsules have been recycled",
-  "recycleCommandNotification": "\uD83C\uDF31{{user}} has recycled all capsules"
+  "recycleCommandNotification": "\uD83C\uDF31{{user}} has recycled all capsules",
+  "authMiddlewareError": "⛔You are not allowed to use this bot"
 }
