@@ -1,12 +1,5 @@
-import { Context, Telegraf } from "telegraf";
-import { BotProvider } from "../bot.provider.mjs";
+import { BaseBot } from "../bot.base.mjs";
 
-export abstract class Command {
-    protected constructor(private readonly provider: BotProvider) {}
-
-    protected get bot(): Telegraf<Context> {
-        return this.provider.bot;
-    }
-
+export abstract class Command extends BaseBot {
     public abstract handle(): void;
 }

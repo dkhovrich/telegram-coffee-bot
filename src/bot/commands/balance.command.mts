@@ -1,10 +1,9 @@
 import { Command } from "./command.mjs";
 import { StorageService } from "../../storage/storage.types.mjs";
-import { BotProvider } from "../bot.provider.mjs";
 
 export class BalanceCommand extends Command {
-    public constructor(provider: BotProvider, private readonly storage: StorageService) {
-        super(provider);
+    public constructor(private readonly storage: StorageService) {
+        super();
     }
 
     public handle(): void {
