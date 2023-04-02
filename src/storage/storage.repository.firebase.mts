@@ -1,6 +1,7 @@
 import admin from "firebase-admin";
 import { StorageRepository, Transaction, transactionScheme } from "./storage.types.mjs";
 import { ConfigService } from "../services/config.service.mjs";
+// @ts-ignore
 import serviceAccount from "./firebaseAccountKey.json" assert { type: "json" };
 import { AddTransactionModel } from "./storage.repository.sql.mjs";
 
