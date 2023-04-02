@@ -10,7 +10,8 @@
         "start:dev": "node --inspect dist/index.mjs",
         "nodemon": "nodemon --watch './**/*.mts' --exec 'node --experimental-specifier-resolution=node --loader ts-node/esm' src/index.mts",
         "lint": "eslint ./src --ext .mts",
-        "format": "eslint ./src --ext .mts --fix"
+        "format": "eslint ./src --ext .mts --fix",
+        "build:ts": "tsc --noEmit"
     },
     "repository": {
         "type": "git",
