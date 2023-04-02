@@ -5,7 +5,7 @@ import { Markup, Scenes } from "telegraf";
 import { message } from "telegraf/filters";
 import { getUserData } from "./utils.mjs";
 import { NotificationService } from "../../services/notification.service.mjs";
-import { BotFactory } from "../bot.factory.types.mts.js";
+import { BotFactory } from "../bot.factory.types.mjs";
 import { t } from "i18next";
 
 export class AddCommand extends Command {

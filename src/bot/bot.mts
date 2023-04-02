@@ -3,7 +3,7 @@ import { ConfigService } from "../services/config.service.mjs";
 import { Middleware } from "./middlewares/middleware.types.mjs";
 import { Command } from "./commands/command.mjs";
 import { StorageService } from "../storage/storage.types.mjs";
-import { BotFactory } from "./bot.factory.types.mts.js";
+import { BotFactory } from "./bot.factory.types.mjs";
 
 export class Bot {
     private readonly bot: Telegraf<Context>;

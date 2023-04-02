@@ -3,7 +3,7 @@ import { Markup } from "telegraf";
 import { StorageService } from "../../storage/storage.types.mjs";
 import { getUserData } from "./utils.mjs";
 import { NotificationService } from "../../services/notification.service.mjs";
-import { BotFactory } from "../bot.factory.types.mts.js";
+import { BotFactory } from "../bot.factory.types.mjs";
 import { t } from "i18next";
 
 export class RecycleCommand extends Command {

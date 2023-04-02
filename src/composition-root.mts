@@ -10,7 +10,7 @@ import { AddCommand } from "./bot/commands/add.command.mjs";
 import { RecycleCommand } from "./bot/commands/recycle.command.mjs";
 import { BalanceCommand } from "./bot/commands/balance.command.mjs";
 import { StorageRepository, StorageService } from "./storage/storage.types.mjs";
-import { StorageServiceImpl } from "./storage/storage.service.mts.js";
+import { StorageServiceImpl } from "./storage/storage.service.mjs";
 import { StorageRepositoryFirebase } from "./storage/storage.repository.firebase.mjs";
 import { StorageRepositorySql } from "./storage/storage.repository.sql.mjs";
 import { UsersService, UsersServiceImpl } from "./services/users.service.mjs";
