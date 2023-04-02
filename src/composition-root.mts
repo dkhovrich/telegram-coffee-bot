@@ -16,6 +16,7 @@ import { StorageRepositorySql } from "./storage/storage.repository.sql.mjs";
 import { UsersService, UsersServiceImpl } from "./services/users.service.mjs";
 import { NotificationService, NotificationServiceImpl } from "./services/notification.service.mjs";
 import { Context, Telegraf } from "telegraf";
+import { IBaseBot } from "./bot/bot.base.mjs";
 
 type BotFactory<T> = Factory<T, [bot: Telegraf<Context>]>;
 
@@ -40,6 +41,10 @@ export const TOKENS = {
     }
 };
 
+function setBot(instance: IBaseBot, bot: Telegraf<Context>): void {
+    instance.setBot(bot);
+}
+
 function bindMiddlewares(container: Container): void {
     injected(AuthMiddleware, TOKENS.usersService);
     container.bind(TOKENS.middlewares.auth).toInstance(AuthMiddleware).inSingletonScope();
@@ -50,16 +55,16 @@ function bindMiddlewares(container: Container): void {
 }
 
 function bindCommands(container: Container): void {
-    container.bind(TOKENS.commands.start).toFactory(StartCommand, (instance, bot) => instance.setBot(bot));
+    container.bind(TOKENS.commands.start).toFactory(StartCommand, setBot);
 
     injected(AddCommand, TOKENS.storageService, TOKENS.notificationService);
-    container.bind(TOKENS.commands.add).toFactory(AddCommand, (instance, bot) => instance.setBot(bot));
+    container.bind(TOKENS.commands.add).toFactory(AddCommand, setBot);
 
     injected(RecycleCommand, TOKENS.storageService, TOKENS.notificationService);
-    container.bind(TOKENS.commands.recycle).toFactory(RecycleCommand, (instance, bot) => instance.setBot(bot));
+    container.bind(TOKENS.commands.recycle).toFactory(RecycleCommand, setBot);
 
     injected(BalanceCommand, TOKENS.storageService);
-    container.bind(TOKENS.commands.balance).toFactory(BalanceCommand, (instance, bot) => instance.setBot(bot));
+    container.bind(TOKENS.commands.balance).toFactory(BalanceCommand, setBot);
 
     container.bind(TOKENS.commands.all).toConstant(bot => {
         const commands = [TOKENS.commands.start, TOKENS.commands.add, TOKENS.commands.recycle, TOKENS.commands.balance];
@@ -79,9 +84,7 @@ export function createContainer(): Container {
     container.bind(TOKENS.usersService).toInstance(UsersServiceImpl).inSingletonScope();
 
     injected(NotificationServiceImpl, TOKENS.usersService);
-    container
-        .bind(TOKENS.notificationService)
-        .toFactory(NotificationServiceImpl, (instance, bot) => instance.setBot(bot));
+    container.bind(TOKENS.notificationService).toFactory(NotificationServiceImpl, setBot);
 
     if (process.env["STORAGE_TYPE"] === "sql") {
         injected(StorageRepositorySql, TOKENS.configService);
