@@ -6,7 +6,7 @@ import { message } from "telegraf/filters";
 import { getUserData } from "./utils.mjs";
 import { NotificationService } from "../../services/notification.service.mjs";
 import { BotFactory } from "../bot.factory.types.mts.js";
-import i18next from "i18next";
+import { t } from "i18next";
 
 export class AddCommand extends Command {
     private static readonly QUESTION_ID = "QUESTION_ID";
@@ -37,20 +37,20 @@ export class AddCommand extends Command {
 
         question.enter(async ctx => {
             this.value = null;
-            await ctx.reply(i18next.t("addCommandQuestion") as string);
+            await ctx.reply(t("addCommandQuestion") as string);
         });
 
         question.on(message("text"), async ctx => {
             const result = z.coerce.number().safeParse(ctx.message.text);
             if (!result.success) {
-                ctx.reply(i18next.t("addCommandError") as string);
+                ctx.reply(t("addCommandError") as string);
                 // @ts-ignore
                 ctx.scene.leave();
                 return;
             }
 
             this.value = result.data;
-            const replyText = i18next.t(this.value > 0 ? "addCommandConfirmAdd" : "addCommandConfirmRemove", {
+            const replyText = t(this.value > 0 ? "addCommandConfirmAdd" : "addCommandConfirmRemove", {
                 count: Math.abs(this.value)
             });
             ctx.reply(
@@ -74,22 +74,23 @@ export class AddCommand extends Command {
 
             const user = getUserData(ctx.from);
             const amount = await this.storage.add(this.value, user.name);
-            const responseText = i18next.t(this.value > 0 ? "addCommandResponseAdd" : "addCommandResponseRemove", {
+            const responseText = t(this.value > 0 ? "addCommandResponseAdd" : "addCommandResponseRemove", {
                 count: Math.abs(this.value),
                 amount
             });
             ctx.editMessageText(responseText);
 
             const notificationService = this.notificationServiceFactory(this.bot);
-            const notificationText = i18next.t(
-                this.value > 0 ? "addCommandNotificationAdd" : "addCommandNotificationRemove",
-                { user: user.displayName, count: Math.abs(this.value), amount }
-            );
+            const notificationText = t(this.value > 0 ? "addCommandNotificationAdd" : "addCommandNotificationRemove", {
+                user: user.displayName,
+                count: Math.abs(this.value),
+                amount
+            });
             await notificationService.notifyAll(user.id, notificationText);
         });
 
         this.bot.action(AddCommand.CANCEL_BUTTON_ID, ctx => {
-            ctx.editMessageText(i18next.t("addCommandCancel"));
+            ctx.editMessageText(t("addCommandCancel"));
         });
     }
 }

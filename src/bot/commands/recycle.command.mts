@@ -4,7 +4,7 @@ import { StorageService } from "../../storage/storage.types.mjs";
 import { getUserData } from "./utils.mjs";
 import { NotificationService } from "../../services/notification.service.mjs";
 import { BotFactory } from "../bot.factory.types.mts.js";
-import i18next from "i18next";
+import { t } from "i18next";
 
 export class RecycleCommand extends Command {
     private static readonly CONFIRM_BUTTON_ID = "RESET_CONFIRM_BUTTON_ID";
@@ -22,11 +22,11 @@ export class RecycleCommand extends Command {
         this.bot.command("recycle", async ctx => {
             const amount = await this.storage.get();
             if (amount < RecycleCommand.MIN_RECYCLE_AMOUNT) {
-                ctx.reply(i18next.t("recycleCommandNotEnough") as string);
+                ctx.reply(t("recycleCommandNotEnough") as string);
                 return;
             }
             ctx.reply(
-                i18next.t("recycleCommandQuestion") as string,
+                t("recycleCommandQuestion") as string,
                 Markup.inlineKeyboard([
                     Markup.button.callback("Yes", RecycleCommand.CONFIRM_BUTTON_ID),
                     Markup.button.callback("No", RecycleCommand.CANCEL_BUTTON_ID)
@@ -42,17 +42,14 @@ export class RecycleCommand extends Command {
 
             const user = getUserData(ctx.from);
             await this.storage.recycle(user.name);
-            ctx.editMessageText(i18next.t("recycleCommandResponse"));
+            ctx.editMessageText(t("recycleCommandResponse"));
 
             const notificationService = this.notificationServiceFactory(this.bot);
-            await notificationService.notifyAll(
-                user.id,
-                i18next.t("recycleCommandNotification", { user: user.displayName })
-            );
+            await notificationService.notifyAll(user.id, t("recycleCommandNotification", { user: user.displayName }));
         });
 
         this.bot.action(RecycleCommand.CANCEL_BUTTON_ID, async ctx => {
-            ctx.editMessageText(i18next.t("recycleCommandCancel"));
+            ctx.editMessageText(t("recycleCommandCancel"));
         });
     }
 }
