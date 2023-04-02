@@ -23,10 +23,10 @@ export class StorageRepositoryFirebase implements StorageRepository {
 
     public async getLastTransaction(): Promise<Transaction | null> {
         const document = await this.database.collection("transactions").orderBy("createdAt", "desc").limit(1).get();
-        if (document.empty) {
+        const doc = document.docs[0];
+        if (document.empty || doc == null) {
             return null;
         }
-        const doc = document.docs[0]!;
         const transaction: Transaction = {
             id: doc.id,
             type: doc.get("type"),
