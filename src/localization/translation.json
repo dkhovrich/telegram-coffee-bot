@@ -1,0 +1,18 @@
+{
+  "startCommandReply": "☕\uFE0FWelcome to the Coffee Capsules Bot!",
+  "addCommandQuestion": "☕\uFE0FHow many capsules would you like to add?",
+  "addCommandError": "⚠\uFE0FInvalid value. Please use /add command again",
+  "addCommandConfirmAdd": "\uD83E\uDD14Are you sure you want to add {{count}} capsules?",
+  "addCommandConfirmRemove": "\uD83E\uDD14Are you sure you want to remove {{count}} capsules?",
+  "addCommandCancel": "\uD83E\uDD72\uFE0FOkay, come back with capsules later",
+  "addCommandResponseAdd": "\uD83E\uDEE1Added {{count}} capsules.\nTotal amount: {{amount}}",
+  "addCommandResponseRemove": "\uD83E\uDEE1Removed {{count}} capsules.\nTotal amount: {{amount}}",
+  "addCommandNotificationAdd": "\uD83E\uDEE1{{user}} has added {{count}} capsules.\nTotal amount: {{amount}}",
+  "addCommandNotificationRemove": "\uD83E\uDEE1{{user}} has removed {{count}} capsules.\nTotal amount: {{amount}}",
+  "balanceCommandReply": "\uD83E\uDDD0Capsules amount: {{amount}}",
+  "recycleCommandNotEnough": "\uD83E\uDD37You don't have enough capsules to recycle",
+  "recycleCommandQuestion": "\uD83E\uDD14Are you sure you want to recycle all your capsules?",
+  "recycleCommandCancel": "☕\uFE0FOkay, come back with capsules later",
+  "recycleCommandResponse": "\uD83C\uDF31All capsules have been recycled",
+  "recycleCommandNotification": "\uD83C\uDF31{{user}} has recycled all capsules"
+}

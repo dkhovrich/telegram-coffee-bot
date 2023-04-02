@@ -6,6 +6,7 @@ import { message } from "telegraf/filters";
 import { getUserData } from "./utils.mjs";
 import { NotificationService } from "../../services/notification.service.mjs";
 import { BotFactory } from "../bot.factory.types.mts.js";
+import i18next from "i18next";
 
 export class AddCommand extends Command {
     private static readonly QUESTION_ID = "QUESTION_ID";
@@ -36,21 +37,24 @@ export class AddCommand extends Command {
 
         question.enter(async ctx => {
             this.value = null;
-            await ctx.reply("☕️How many capsules would you like to add?");
+            await ctx.reply(i18next.t("addCommandQuestion") as string);
         });
 
         question.on(message("text"), async ctx => {
             const result = z.coerce.number().safeParse(ctx.message.text);
             if (!result.success) {
-                ctx.reply("⚠️Invalid value. Please use /add command again");
+                ctx.reply(i18next.t("addCommandError") as string);
                 // @ts-ignore
                 ctx.scene.leave();
                 return;
             }
 
             this.value = result.data;
+            const replyText = i18next.t(this.value > 0 ? "addCommandConfirmAdd" : "addCommandConfirmRemove", {
+                count: Math.abs(this.value)
+            });
             ctx.reply(
-                `🤔Are you sure you want to ${this.value > 0 ? "add" : "remove"} ${Math.abs(this.value)} capsules?`,
+                replyText,
                 Markup.inlineKeyboard([
                     Markup.button.callback("Yes", AddCommand.CONFIRM_BUTTON_ID),
                     Markup.button.callback("No", AddCommand.CANCEL_BUTTON_ID)
@@ -70,22 +74,22 @@ export class AddCommand extends Command {
 
             const user = getUserData(ctx.from);
             const amount = await this.storage.add(this.value, user.name);
-            ctx.editMessageText(AddCommand.getConfirmationResponseText(this.value, amount));
+            const responseText = i18next.t(this.value > 0 ? "addCommandResponseAdd" : "addCommandResponseRemove", {
+                count: Math.abs(this.value),
+                amount
+            });
+            ctx.editMessageText(responseText);
 
-            const notificationText = AddCommand.getConfirmationNotificationText(user.displayName, this.value, amount);
-            await this.notificationServiceFactory(this.bot).notifyAll(user.id, notificationText);
+            const notificationService = this.notificationServiceFactory(this.bot);
+            const notificationText = i18next.t(
+                this.value > 0 ? "addCommandNotificationAdd" : "addCommandNotificationRemove",
+                { user: user.displayName, count: Math.abs(this.value), amount }
+            );
+            await notificationService.notifyAll(user.id, notificationText);
         });
 
         this.bot.action(AddCommand.CANCEL_BUTTON_ID, ctx => {
-            ctx.editMessageText("🥲️Okay, come back with capsules later");
+            ctx.editMessageText(i18next.t("addCommandCancel"));
         });
-    }
-
-    private static getConfirmationResponseText(value: number, amount: number): string {
-        return `🫡${value > 0 ? "Added" : "Removed"} ${Math.abs(value)} capsules.\nTotal amount: ${amount}`;
-    }
-
-    private static getConfirmationNotificationText(user: string, value: number, amount: number): string {
-        return ` 🫡${user} has ${value > 0 ? "added" : "removed"} ${Math.abs(value)} capsules.\nTotal amount: ${amount}`;
     }
 }
