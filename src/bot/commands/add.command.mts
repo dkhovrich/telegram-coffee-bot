@@ -56,8 +56,8 @@ export class AddCommand extends Command {
             ctx.reply(
                 replyText,
                 Markup.inlineKeyboard([
-                    Markup.button.callback("Yes", AddCommand.CONFIRM_BUTTON_ID),
-                    Markup.button.callback("No", AddCommand.CANCEL_BUTTON_ID)
+                    Markup.button.callback("No", AddCommand.CANCEL_BUTTON_ID),
+                    Markup.button.callback("Yes", AddCommand.CONFIRM_BUTTON_ID)
                 ])
             );
 
