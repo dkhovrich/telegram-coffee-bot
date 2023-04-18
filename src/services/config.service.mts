@@ -1,35 +1,40 @@
+import { z } from "zod";
 import { config } from "dotenv";
 import { assert } from "../utils/assert.mjs";
 
+const envSchema = z.object({
+    TOKEN: z.string(),
+    USER_IDS: z.string(),
+    SQL_DATABASE_HOST: z.string(),
+    SQL_DATABASE_USER: z.string(),
+    SQL_DATABASE_PASSWORD: z.string(),
+    SQL_DATABASE_NAME: z.string(),
+    FIREBASE_DATABASE_URL: z.string()
+});
+
+export type Env = z.infer<typeof envSchema>;
+
+function loadDevConfig(): Record<string, string> {
+    const { error, parsed } = config();
+    assert(error == null, "Error loading .env file");
+    assert(parsed != null, "Empty .env file");
+
+    return parsed;
+}
+
 export interface ConfigService {
-    get(key: string): string;
+    get(key: keyof Env): string;
 }
 
-abstract class BaseConfigService implements ConfigService {
-    protected constructor(private readonly config: Record<string, string | undefined>) {}
+export class ConfigServiceImpl implements ConfigService {
+    private readonly env: Env;
 
-    public get(key: string): string {
-        const result = this.config[key];
-        assert(result != null, `Missing environment variable: ${key}`);
-        return result;
-    }
-}
-
-export class ConfigServiceDevImpl extends BaseConfigService {
     public constructor() {
-        console.log("Create development configuration");
-
-        const { error, parsed } = config();
-        assert(error == null, "Error loading .env file");
-        assert(parsed != null, "Empty .env file");
-
-        super(parsed);
+        const env = process.env["NODE_ENV"] === "development" ? loadDevConfig() : process.env;
+        this.env = envSchema.parse(env);
     }
-}
 
-export class ConfigServiceProdImpl extends BaseConfigService {
-    public constructor() {
-        console.log("Create production configuration");
-        super(process.env);
+    public get(key: keyof Env): string {
+        return this.env[key];
     }
 }
