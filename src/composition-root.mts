@@ -1,5 +1,5 @@
 import { Container, Factory, injected, token } from "brandi";
-import { ConfigService, ConfigServiceImpl } from "./services/config.service.mjs";
+import { ConfigService, createConfigService } from "./services/config.service.mjs";
 import { Bot } from "./bot/bot.mjs";
 import { StartCommand } from "./bot/commands/start.command.mjs";
 import { Command } from "./bot/commands/command.mjs";
@@ -75,7 +75,7 @@ function bindCommands(container: Container): void {
 export function createContainer(): Container {
     const container = new Container();
 
-    container.bind(TOKENS.configService).toInstance(ConfigServiceImpl).inSingletonScope();
+    container.bind(TOKENS.configService).toInstance(createConfigService).inSingletonScope();
 
     injected(UsersServiceImpl, TOKENS.configService);
     container.bind(TOKENS.usersService).toInstance(UsersServiceImpl).inSingletonScope();

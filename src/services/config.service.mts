@@ -7,27 +7,11 @@ interface SqlConfig {
     database: string;
 }
 
-export interface ConfigService {
-    token: string;
-    userIds: number[];
-    sql: SqlConfig;
-    firebaseDatabaseUrl: string;
-}
+export type ConfigService = ReturnType<typeof createConfigService>;
 
-export class ConfigServiceImpl implements ConfigService {
-    get token(): string {
-        return config.get("token");
-    }
-
-    get userIds(): number[] {
-        return config.get("userIds");
-    }
-
-    get sql(): SqlConfig {
-        return config.get<SqlConfig>("sql");
-    }
-
-    get firebaseDatabaseUrl(): string {
-        return config.get("firebaseDatabaseUrl");
-    }
-}
+export const createConfigService = () => ({
+    token: config.get<string>("token"),
+    userIds: config.get<number[]>("userIds"),
+    sql: config.get<SqlConfig>("sql"),
+    firebaseDatabaseUrl: config.get<string>("firebaseDatabaseUrl")
+});
