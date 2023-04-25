@@ -42,12 +42,7 @@ CREATE TABLE IF NOT EXISTS transactions
     private async query<T>(fn: (connection: Connection) => Promise<T>): Promise<T> {
         let connection: Connection | null = null;
         try {
-            connection = await mysql.createConnection({
-                host: this.config.get("SQL_DATABASE_HOST"),
-                user: this.config.get("SQL_DATABASE_USER"),
-                password: this.config.get("SQL_DATABASE_PASSWORD"),
-                database: this.config.get("SQL_DATABASE_NAME")
-            });
+            connection = await mysql.createConnection(this.config.sql);
             return fn(connection);
         } catch (error) {
             await connection?.end();

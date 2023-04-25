@@ -11,7 +11,7 @@ export class StorageRepositoryFirebase implements StorageRepository {
     public constructor(private readonly config: ConfigService) {
         admin.initializeApp({
             credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
-            databaseURL: this.config.get("FIREBASE_DATABASE_URL")
+            databaseURL: this.config.firebaseDatabaseUrl
         });
 
         this.database = admin.firestore();

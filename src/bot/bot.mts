@@ -15,7 +15,7 @@ export class Bot {
         private readonly storage: StorageService,
         private readonly middlewares: Middleware[]
     ) {
-        this.bot = new Telegraf<Context>(this.config.get("TOKEN"));
+        this.bot = new Telegraf<Context>(this.config.token);
         this.commands = commandsFactory(this.bot);
         this.middlewares.forEach(middleware => this.bot.use(middleware.create()));
     }

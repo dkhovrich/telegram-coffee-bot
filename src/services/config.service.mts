@@ -1,40 +1,33 @@
-import { z } from "zod";
-import { config } from "dotenv";
-import { assert } from "../utils/assert.mjs";
+import config from "config";
 
-const envSchema = z.object({
-    TOKEN: z.string(),
-    USER_IDS: z.string(),
-    SQL_DATABASE_HOST: z.string(),
-    SQL_DATABASE_USER: z.string(),
-    SQL_DATABASE_PASSWORD: z.string(),
-    SQL_DATABASE_NAME: z.string(),
-    FIREBASE_DATABASE_URL: z.string()
-});
-
-export type Env = z.infer<typeof envSchema>;
-
-function loadDevConfig(): Record<string, string> {
-    const { error, parsed } = config();
-    assert(error == null, "Error loading .env file");
-    assert(parsed != null, "Empty .env file");
-
-    return parsed;
+interface SqlConfig {
+    host: string;
+    user: string;
+    password: string;
+    database: string;
 }
 
 export interface ConfigService {
-    get(key: keyof Env): string;
+    token: string;
+    userIds: number[];
+    sql: SqlConfig;
+    firebaseDatabaseUrl: string;
 }
 
 export class ConfigServiceImpl implements ConfigService {
-    private readonly env: Env;
-
-    public constructor() {
-        const env = process.env["NODE_ENV"] === "development" ? loadDevConfig() : process.env;
-        this.env = envSchema.parse(env);
+    get token(): string {
+        return config.get("token");
     }
 
-    public get(key: keyof Env): string {
-        return this.env[key];
+    get userIds(): number[] {
+        return config.get("userIds");
+    }
+
+    get sql(): SqlConfig {
+        return config.get<SqlConfig>("sql");
+    }
+
+    get firebaseDatabaseUrl(): string {
+        return config.get("firebaseDatabaseUrl");
     }
 }
