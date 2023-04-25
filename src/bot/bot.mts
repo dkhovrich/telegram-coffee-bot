@@ -31,7 +31,7 @@ export class Bot {
             process.once("SIGINT", () => this.bot.stop("SIGINT"));
             process.once("SIGTERM", () => this.bot.stop("SIGTERM"));
 
-            console.log("Starting bot...");
+            console.log("Starting bot");
             await this.bot.launch();
         } catch (error) {
             console.error("init error", error);
