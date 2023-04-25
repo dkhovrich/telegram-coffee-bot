@@ -28,8 +28,8 @@ export class RecycleCommand extends Command {
             ctx.reply(
                 t("recycleCommandQuestion") as string,
                 Markup.inlineKeyboard([
-                    Markup.button.callback("No", RecycleCommand.CANCEL_BUTTON_ID),
-                    Markup.button.callback("Yes", RecycleCommand.CONFIRM_BUTTON_ID)
+                    Markup.button.callback(t("no"), RecycleCommand.CANCEL_BUTTON_ID),
+                    Markup.button.callback(t("yes"), RecycleCommand.CONFIRM_BUTTON_ID)
                 ])
             );
         });

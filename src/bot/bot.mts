@@ -15,7 +15,7 @@ export class Bot {
         private readonly storage: StorageService,
         private readonly middlewares: Middleware[]
     ) {
-        this.bot = new Telegraf<Context>(this.config.get("TOKEN"));
+        this.bot = new Telegraf<Context>(this.config.token);
         this.commands = commandsFactory(this.bot);
         this.middlewares.forEach(middleware => this.bot.use(middleware.create()));
     }
@@ -31,7 +31,7 @@ export class Bot {
             process.once("SIGINT", () => this.bot.stop("SIGINT"));
             process.once("SIGTERM", () => this.bot.stop("SIGTERM"));
 
-            console.log("Starting bot...");
+            console.log("Starting bot");
             await this.bot.launch();
         } catch (error) {
             console.error("init error", error);

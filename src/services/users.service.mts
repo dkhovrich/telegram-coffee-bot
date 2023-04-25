@@ -9,7 +9,7 @@ export class UsersServiceImpl implements UsersService {
     public readonly users: number[];
 
     constructor(config: ConfigService) {
-        this.users = config.get("USER_IDS").split(",").map(Number);
+        this.users = config.userIds;
     }
 
     public isAllowed(id: number): boolean {
