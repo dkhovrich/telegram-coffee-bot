@@ -106,6 +106,4 @@ dist
 .idea
 
 session.json
-src/storage/firebaseAccountKey.json
-
 config/
