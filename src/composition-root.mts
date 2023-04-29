@@ -15,10 +15,10 @@ import { StorageRepositoryFirebase } from "./storage/storage.repository.firebase
 import { StorageRepositorySql } from "./storage/storage.repository.sql.mjs";
 import { UsersService, UsersServiceImpl } from "./services/users.service.mjs";
 import { NotificationService, NotificationServiceImpl } from "./services/notification.service.mjs";
-import { Context, Telegraf } from "telegraf";
 import { IBaseBot } from "./bot/bot.base.mjs";
+import { TelegrafBot } from "./bot/types.mjs";
 
-type BotFactory<T> = Factory<T, [bot: Telegraf<Context>]>;
+type BotFactory<T> = Factory<T, [bot: TelegrafBot]>;
 
 export const TOKENS = {
     configService: token<ConfigService>("config.service"),
@@ -37,11 +37,11 @@ export const TOKENS = {
         add: token<BotFactory<Command>>("command.add"),
         recycle: token<BotFactory<Command>>("command.recycle"),
         balance: token<BotFactory<Command>>("command.balance"),
-        all: token<Factory<Command[], [bot: Telegraf<Context>]>>("commands")
+        all: token<Factory<Command[], [bot: TelegrafBot]>>("commands")
     }
 };
 
-function setBot(instance: IBaseBot, bot: Telegraf<Context>): void {
+function setBot(instance: IBaseBot, bot: TelegrafBot): void {
     instance.setBot(bot);
 }
 

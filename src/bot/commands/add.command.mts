@@ -7,12 +7,12 @@ import { getUserData } from "./utils.mjs";
 import { NotificationService } from "../../services/notification.service.mjs";
 import { BotFactory } from "../bot.factory.types.mjs";
 import { t } from "i18next";
+import { BotContext } from "../types.mjs";
 
 export class AddCommand extends Command {
     private static readonly QUESTION_ID = "QUESTION_ID";
     private static readonly CONFIRM_BUTTON_ID = "ADD_CONFIRM_BUTTON_ID";
     private static readonly CANCEL_BUTTON_ID = "ADD_CANCEL_BUTTON_ID";
-    private value: number | null = null;
 
     public constructor(
         private readonly storage: StorageService,
@@ -32,11 +32,11 @@ export class AddCommand extends Command {
         this.handleConfirmationActions();
     }
 
-    private createQuestion(): Scenes.BaseScene {
-        const question = new Scenes.BaseScene(AddCommand.QUESTION_ID);
+    private createQuestion(): Scenes.BaseScene<BotContext> {
+        const question = new Scenes.BaseScene<BotContext>(AddCommand.QUESTION_ID);
 
         question.enter(async ctx => {
-            this.value = null;
+            ctx.session.addValue = null;
             await ctx.reply(t("addCommandQuestion") as string);
         });
 
@@ -49,9 +49,9 @@ export class AddCommand extends Command {
                 return;
             }
 
-            this.value = result.data;
-            const replyText = t(this.value > 0 ? "addCommandConfirmAdd" : "addCommandConfirmRemove", {
-                count: Math.abs(this.value)
+            ctx.session.addValue = result.data;
+            const replyText = t(result.data > 0 ? "addCommandConfirmAdd" : "addCommandConfirmRemove", {
+                count: Math.abs(result.data)
             });
             ctx.reply(
                 replyText,
@@ -70,27 +70,28 @@ export class AddCommand extends Command {
 
     private handleConfirmationActions(): void {
         this.bot.action(AddCommand.CONFIRM_BUTTON_ID, async ctx => {
-            if (this.value == null || ctx.from == null) return;
+            if (ctx.session.addValue == null || ctx.from == null) return;
 
             const user = getUserData(ctx.from);
-            const amount = await this.storage.add(this.value, user.name);
-            const responseText = t(this.value > 0 ? "addCommandResponseAdd" : "addCommandResponseRemove", {
-                count: Math.abs(this.value),
+            const amount = await this.storage.add(ctx.session.addValue, user.name);
+            const responseText = t(ctx.session.addValue > 0 ? "addCommandResponseAdd" : "addCommandResponseRemove", {
+                count: Math.abs(ctx.session.addValue),
                 amount
             });
             ctx.editMessageText(responseText);
 
             const notificationService = this.notificationServiceFactory(this.bot);
-            const notificationText = t(this.value > 0 ? "addCommandNotificationAdd" : "addCommandNotificationRemove", {
-                user: user.displayName,
-                count: Math.abs(this.value),
-                amount
-            });
+            const notificationText = t(
+                ctx.session.addValue > 0 ? "addCommandNotificationAdd" : "addCommandNotificationRemove",
+                { user: user.displayName, count: Math.abs(ctx.session.addValue), amount }
+            );
             await notificationService.notifyAll(user.id, notificationText);
+            ctx.session.addValue = null;
         });
 
         this.bot.action(AddCommand.CANCEL_BUTTON_ID, ctx => {
             ctx.editMessageText(t("addCommandCancel"));
+            ctx.session.addValue = null;
         });
     }
 }

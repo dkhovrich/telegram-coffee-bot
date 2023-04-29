@@ -1,12 +1,13 @@
-import { Context, Telegraf } from "telegraf";
+import { Telegraf } from "telegraf";
 import { ConfigService } from "../services/config.service.mjs";
 import { Middleware } from "./middlewares/middleware.types.mjs";
 import { Command } from "./commands/command.mjs";
 import { StorageService } from "../storage/storage.types.mjs";
 import { BotFactory } from "./bot.factory.types.mjs";
+import { BotContext, TelegrafBot } from "./types.mjs";
 
 export class Bot {
-    private readonly bot: Telegraf<Context>;
+    private readonly bot: TelegrafBot;
     private readonly commands: Command[];
 
     public constructor(
@@ -15,7 +16,7 @@ export class Bot {
         private readonly storage: StorageService,
         private readonly middlewares: Middleware[]
     ) {
-        this.bot = new Telegraf<Context>(this.config.token);
+        this.bot = new Telegraf<BotContext>(this.config.token);
         this.commands = commandsFactory(this.bot);
         this.middlewares.forEach(middleware => this.bot.use(middleware.create()));
     }
