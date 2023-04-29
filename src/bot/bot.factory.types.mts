@@ -1,3 +1,3 @@
-import { Context, Telegraf } from "telegraf";
+import { TelegrafBot } from "./types.mjs";
 
-export type BotFactory<T> = (bot: Telegraf<Context>) => T;
+export type BotFactory<T> = (bot: TelegrafBot) => T;
