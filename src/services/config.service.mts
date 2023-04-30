@@ -1,33 +1,39 @@
 import config from "config";
+import { z } from "zod";
 
-export type SqlConfig = {
-    host: string;
-    user: string;
-    password: string;
-    database: string;
-};
-
-export type FirebaseConfig = {
-    credential: {
-        type: string;
-        project_id: string;
-        private_key_id: string;
-        private_key: string;
-        client_email: string;
-        client_id: string;
-        auth_uri: string;
-        token_uri: string;
-        auth_provider_x509_cert_url: string;
-        client_x509_cert_url: string;
-    };
-    databaseURL: string;
-};
-
-export type ConfigService = ReturnType<typeof createConfigService>;
-
-export const createConfigService = () => ({
-    token: config.get<string>("token"),
-    userIds: config.get<number[]>("userIds"),
-    sql: config.get<SqlConfig>("sql"),
-    firebase: config.get<FirebaseConfig>("firebase")
+const configSchema = z.object({
+    token: z.string(),
+    userIds: z.number().array(),
+    sql: z.object({
+        host: z.string(),
+        user: z.string(),
+        password: z.string(),
+        database: z.string()
+    }),
+    firebase: z.object({
+        credential: z.object({
+            type: z.string(),
+            project_id: z.string(),
+            private_key_id: z.string(),
+            private_key: z.string(),
+            client_email: z.string(),
+            client_id: z.string(),
+            auth_uri: z.string(),
+            token_uri: z.string(),
+            auth_provider_x509_cert_url: z.string(),
+            client_x509_cert_url: z.string()
+        }),
+        databaseURL: z.string()
+    })
 });
+
+export type ConfigService = z.infer<typeof configSchema>;
+
+export function createConfigService(): ConfigService {
+    return configSchema.parse({
+        token: config.get("token"),
+        userIds: config.get("userIds"),
+        sql: config.get("sql"),
+        firebase: config.get("firebase")
+    });
+}
