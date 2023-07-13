@@ -8,8 +8,10 @@
         "build": "rimraf ./dist && tsc",
         "start": "cross-env NODE_ENV=production node dist/index.mjs",
         "start:dev": "cross-env NODE_ENV=development node --inspect dist/index.mjs",
-        "lint": "eslint ./src --ext .mts",
-        "format": "eslint ./src --ext .mts --fix",
+        "prettier:check": "prettier . --check",
+        "prettier:write": "prettier . --write",
+        "lint:check": "eslint ./src --ext .mts",
+        "lint:format": "eslint ./src --ext .mts --fix",
         "build:ts": "tsc --noEmit"
     },
     "repository": {
