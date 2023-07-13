@@ -8,6 +8,7 @@
         "build": "rimraf ./dist && tsc",
         "start": "cross-env NODE_ENV=production node dist/index.mjs",
         "start:dev": "cross-env NODE_ENV=development node --inspect dist/index.mjs",
+        "start:gcloud": "cross-env NODE_ENV=development functions-framework --target=bot --source=dist/index.mjs",
         "prettier:check": "prettier . --check",
         "prettier:write": "prettier . --write",
         "lint:check": "eslint ./src --ext .mts",
@@ -40,6 +41,7 @@
         "typescript": "^5.1.6"
     },
     "dependencies": {
+        "@google-cloud/functions-framework": "^3.3.0",
         "brandi": "^5.0.0",
         "config": "^3.3.9",
         "cross-env": "^7.0.3",

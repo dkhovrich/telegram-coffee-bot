@@ -1,6 +1,6 @@
 import { Container, Factory, injected, token } from "brandi";
 import { ConfigService, createConfigService } from "./services/config.service.mjs";
-import { Bot } from "./bot/bot.mjs";
+import { BotServer } from "./bot/bot.server.mjs";
 import { StartCommand } from "./bot/commands/start.command.mjs";
 import { Command } from "./bot/commands/command.mjs";
 import { Middleware } from "./bot/middlewares/middleware.types.mjs";
@@ -17,6 +17,8 @@ import { UsersService, UsersServiceImpl } from "./services/users.service.mjs";
 import { NotificationService, NotificationServiceImpl } from "./services/notification.service.mjs";
 import { IBaseBot } from "./bot/bot.base.mjs";
 import { TelegrafBot } from "./bot/types.mjs";
+import { BotWebhook } from "./bot/bot.webhook.mjs";
+import { Bot } from "./bot/bot.types.mjs";
 
 type BotFactory<T> = Factory<T, [bot: TelegrafBot]>;
 
@@ -24,7 +26,10 @@ export const TOKENS = {
     configService: token<ConfigService>("config.service"),
     usersService: token<UsersService>("users.service"),
     notificationService: token<BotFactory<NotificationService>>("notification.service"),
-    bot: token<Bot>("bot.instance"),
+    bot: {
+        server: token<Bot>("bot.server"),
+        webhook: token<Bot>("bot.webhook")
+    },
     storageRepository: token<StorageRepository>("storage.repository"),
     storageService: token<StorageService>("storage"),
     middlewares: {
@@ -97,8 +102,11 @@ export function createContainer(): Container {
     bindMiddlewares(container);
     bindCommands(container);
 
-    injected(Bot, TOKENS.commands.all, TOKENS.configService, TOKENS.storageService, TOKENS.middlewares.all);
-    container.bind(TOKENS.bot).toInstance(Bot).inSingletonScope();
+    injected(BotServer, TOKENS.commands.all, TOKENS.configService, TOKENS.storageService, TOKENS.middlewares.all);
+    container.bind(TOKENS.bot.server).toInstance(BotServer).inSingletonScope();
+
+    injected(BotWebhook, TOKENS.commands.all, TOKENS.configService, TOKENS.storageService, TOKENS.middlewares.all);
+    container.bind(TOKENS.bot.webhook).toInstance(BotWebhook).inSingletonScope();
 
     return container;
 }
