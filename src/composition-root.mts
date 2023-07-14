@@ -18,7 +18,7 @@ import { NotificationService, NotificationServiceImpl } from "./services/notific
 import { IBaseBot } from "./bot/bot.base.mjs";
 import { TelegrafBot } from "./bot/types.mjs";
 import { BotWebhook } from "./bot/bot.webhook.mjs";
-import { Bot } from "./bot/bot.types.mjs";
+import { IBot } from "./bot/bot.mjs";
 
 type BotFactory<T> = Factory<T, [bot: TelegrafBot]>;
 
@@ -26,7 +26,7 @@ export const TOKENS = {
     configService: token<ConfigService>("config.service"),
     usersService: token<UsersService>("users.service"),
     notificationService: token<BotFactory<NotificationService>>("notification.service"),
-    bot: token<Bot>("bot"),
+    bot: token<IBot>("bot"),
     storageRepository: token<StorageRepository>("storage.repository"),
     storageService: token<StorageService>("storage"),
     middlewares: {
@@ -99,11 +99,17 @@ export function createContainer(): Container {
     bindMiddlewares(container);
     bindCommands(container);
 
+    const botDependencies = [
+        TOKENS.commands.all,
+        TOKENS.middlewares.all,
+        TOKENS.configService,
+        TOKENS.storageService
+    ] as const;
     if (process.env["BOT_MODE"] === "server") {
-        injected(BotServer, TOKENS.commands.all, TOKENS.configService, TOKENS.storageService, TOKENS.middlewares.all);
+        injected(BotServer, ...botDependencies);
         container.bind(TOKENS.bot).toInstance(BotServer).inSingletonScope();
     } else {
-        injected(BotWebhook, TOKENS.commands.all, TOKENS.configService, TOKENS.storageService, TOKENS.middlewares.all);
+        injected(BotWebhook, ...botDependencies);
         container.bind(TOKENS.bot).toInstance(BotWebhook).inSingletonScope();
     }
 
