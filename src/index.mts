@@ -5,6 +5,6 @@ console.log(`Starting in ${process.env["NODE_ENV"]} mode`);
 
 await initLocalization();
 const container = createContainer();
-const bot = container.get(TOKENS.bot.webhook);
+const bot = container.get(TOKENS.bot);
 await bot.init();
 await bot.start();

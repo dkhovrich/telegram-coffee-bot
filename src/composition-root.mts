@@ -26,10 +26,7 @@ export const TOKENS = {
     configService: token<ConfigService>("config.service"),
     usersService: token<UsersService>("users.service"),
     notificationService: token<BotFactory<NotificationService>>("notification.service"),
-    bot: {
-        server: token<Bot>("bot.server"),
-        webhook: token<Bot>("bot.webhook")
-    },
+    bot: token<Bot>("bot"),
     storageRepository: token<StorageRepository>("storage.repository"),
     storageService: token<StorageService>("storage"),
     middlewares: {
@@ -102,11 +99,13 @@ export function createContainer(): Container {
     bindMiddlewares(container);
     bindCommands(container);
 
-    injected(BotServer, TOKENS.commands.all, TOKENS.configService, TOKENS.storageService, TOKENS.middlewares.all);
-    container.bind(TOKENS.bot.server).toInstance(BotServer).inSingletonScope();
-
-    injected(BotWebhook, TOKENS.commands.all, TOKENS.configService, TOKENS.storageService, TOKENS.middlewares.all);
-    container.bind(TOKENS.bot.webhook).toInstance(BotWebhook).inSingletonScope();
+    if (process.env["BOT_MODE"] === "server") {
+        injected(BotServer, TOKENS.commands.all, TOKENS.configService, TOKENS.storageService, TOKENS.middlewares.all);
+        container.bind(TOKENS.bot).toInstance(BotServer).inSingletonScope();
+    } else {
+        injected(BotWebhook, TOKENS.commands.all, TOKENS.configService, TOKENS.storageService, TOKENS.middlewares.all);
+        container.bind(TOKENS.bot).toInstance(BotWebhook).inSingletonScope();
+    }
 
     return container;
 }
