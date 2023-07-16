@@ -18,11 +18,13 @@ import { IBaseBot } from "./bot/bot.base.mjs";
 import { TelegrafBot } from "./bot/types.mjs";
 import { BotWebhook } from "./bot/bot.webhook.mjs";
 import { IBot } from "./bot/bot.mjs";
+import { LoggerFactory, LoggerFactoryImpl } from "./logger/logger.factory.mjs";
 
 type BotFactory<T> = Factory<T, [bot: TelegrafBot]>;
 
 export const TOKENS = {
     config: token<Config>("config"),
+    loggerFactory: token<LoggerFactory>("logger.factory"),
     usersService: token<UsersService>("users.service"),
     notificationService: token<BotFactory<NotificationService>>("notification.service"),
     bot: token<IBot>("bot"),
@@ -78,6 +80,9 @@ export function createContainer(): Container {
 
     container.bind(TOKENS.config).toInstance(createConfigService).inSingletonScope();
 
+    injected(LoggerFactoryImpl, TOKENS.config);
+    container.bind(TOKENS.loggerFactory).toInstance(LoggerFactoryImpl).inSingletonScope();
+
     injected(UsersServiceImpl, TOKENS.config);
     container.bind(TOKENS.usersService).toInstance(UsersServiceImpl).inSingletonScope();
 
@@ -93,7 +98,7 @@ export function createContainer(): Container {
     bindMiddlewares(container);
     bindCommands(container);
 
-    const botDependencies = [TOKENS.config, TOKENS.commands.all, TOKENS.middlewares.all] as const;
+    const botDependencies = [TOKENS.config, TOKENS.loggerFactory, TOKENS.commands.all, TOKENS.middlewares.all] as const;
     if (process.env["BOT_MODE"] === "server") {
         injected(BotServer, ...botDependencies);
         container.bind(TOKENS.bot).toInstance(BotServer).inSingletonScope();

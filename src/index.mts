@@ -1,9 +1,8 @@
 import { createContainer, TOKENS } from "./composition-root.mjs";
 import { initLocalization } from "./localization/localization.mjs";
-import { createLogger } from "./logger.mjs";
 
 const container = createContainer();
-const logger = createLogger("index");
+const logger = container.get(TOKENS.loggerFactory).create("index");
 
 const { isProduction } = container.get(TOKENS.config);
 logger.info("Starting...", { isProduction });

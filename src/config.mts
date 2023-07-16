@@ -19,7 +19,8 @@ const configSchema = z.object({
         }),
         databaseURL: z.string()
     }),
-    isProduction: z.boolean()
+    isProduction: z.boolean(),
+    isWebHook: z.boolean()
 });
 
 export type Config = z.infer<typeof configSchema>;
@@ -29,7 +30,8 @@ export function createConfigService(): Config {
         token: config.get("token"),
         userIds: config.get("userIds"),
         firebase: config.get("firebase"),
-        isProduction: process.env["NODE_ENV"] === "production"
+        isProduction: process.env["NODE_ENV"] === "production",
+        isWebHook: process.env["BOT_MODE"] !== "server"
     };
     return configSchema.parse(configuration);
 }
