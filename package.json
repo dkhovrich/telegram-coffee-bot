@@ -6,11 +6,8 @@
     "type": "module",
     "scripts": {
         "build": "rimraf ./dist && tsc",
-        "start": "cross-env NODE_ENV=production BOT_MODE=server node dist/index.mjs",
-        "start:dev": "cross-env NODE_ENV=development BOT_MODE=server node --inspect dist/index.mjs | bunyan",
-        "start:gcloud": "functions-framework --target=bot --source=dist/index.mjs",
-        "start:gcloud:dev": "cross-env NODE_ENV=development npm run start:gcloud",
-        "start:gcloud:prod": "cross-env NODE_ENV=production npm run start:gcloud",
+        "start": "functions-framework --target=bot --source=dist/index.mjs",
+        "start:dev:server": "cross-env NODE_ENV=development BOT_MODE=server node --inspect dist/index.mjs | bunyan",
         "prettier:check": "prettier . --check",
         "prettier:write": "prettier . --write",
         "lint:check": "eslint ./src --ext .mts",
