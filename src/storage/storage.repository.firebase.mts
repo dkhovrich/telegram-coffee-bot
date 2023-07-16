@@ -1,11 +1,11 @@
 import admin from "firebase-admin";
 import { AddTransactionModel, StorageRepository, Transaction, transactionScheme } from "./storage.types.mjs";
-import { ConfigService } from "../services/config.service.mjs";
+import { Config } from "../services/config.mjs";
 
 export class StorageRepositoryFirebase implements StorageRepository {
     private readonly database: admin.firestore.Firestore;
 
-    public constructor(config: ConfigService) {
+    public constructor(config: Config) {
         const { credential, databaseURL } = config.firebase;
         admin.initializeApp({
             credential: admin.credential.cert(credential as admin.ServiceAccount),

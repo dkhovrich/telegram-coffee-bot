@@ -1,7 +1,7 @@
 import { TelegrafBot } from "./types.mjs";
 import { Command } from "./commands/command.mjs";
 import { BotFactory } from "./bot.types.mjs";
-import { ConfigService } from "../services/config.service.mjs";
+import { Config } from "../services/config.mjs";
 import { Middleware } from "./middlewares/middleware.types.mjs";
 import { createLogger } from "../logger.mjs";
 
@@ -16,7 +16,7 @@ export abstract class Bot implements IBot {
     protected logger = createLogger("bot");
 
     public constructor(
-        private readonly config: ConfigService,
+        private readonly config: Config,
         commandsFactory: BotFactory<Command[]>,
         middlewares: Middleware[]
     ) {

@@ -1,5 +1,5 @@
 import { Container, Factory, injected, token } from "brandi";
-import { ConfigService, createConfigService } from "./services/config.service.mjs";
+import { Config, createConfigService } from "./services/config.mjs";
 import { BotServer } from "./bot/bot.server.mjs";
 import { StartCommand } from "./bot/commands/start.command.mjs";
 import { Command } from "./bot/commands/command.mjs";
@@ -22,7 +22,7 @@ import { IBot } from "./bot/bot.mjs";
 type BotFactory<T> = Factory<T, [bot: TelegrafBot]>;
 
 export const TOKENS = {
-    configService: token<ConfigService>("config.service"),
+    config: token<Config>("config"),
     usersService: token<UsersService>("users.service"),
     notificationService: token<BotFactory<NotificationService>>("notification.service"),
     bot: token<IBot>("bot"),
@@ -76,15 +76,15 @@ function bindCommands(container: Container): void {
 export function createContainer(): Container {
     const container = new Container();
 
-    container.bind(TOKENS.configService).toInstance(createConfigService).inSingletonScope();
+    container.bind(TOKENS.config).toInstance(createConfigService).inSingletonScope();
 
-    injected(UsersServiceImpl, TOKENS.configService);
+    injected(UsersServiceImpl, TOKENS.config);
     container.bind(TOKENS.usersService).toInstance(UsersServiceImpl).inSingletonScope();
 
     injected(NotificationServiceImpl, TOKENS.usersService);
     container.bind(TOKENS.notificationService).toFactory(NotificationServiceImpl, setBot);
 
-    injected(StorageRepositoryFirebase, TOKENS.configService);
+    injected(StorageRepositoryFirebase, TOKENS.config);
     container.bind(TOKENS.storageRepository).toInstance(StorageRepositoryFirebase).inSingletonScope();
 
     injected(StorageServiceImpl, TOKENS.storageRepository);
@@ -93,7 +93,7 @@ export function createContainer(): Container {
     bindMiddlewares(container);
     bindCommands(container);
 
-    const botDependencies = [TOKENS.configService, TOKENS.commands.all, TOKENS.middlewares.all] as const;
+    const botDependencies = [TOKENS.config, TOKENS.commands.all, TOKENS.middlewares.all] as const;
     if (process.env["BOT_MODE"] === "server") {
         injected(BotServer, ...botDependencies);
         container.bind(TOKENS.bot).toInstance(BotServer).inSingletonScope();

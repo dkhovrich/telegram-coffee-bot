@@ -18,15 +18,18 @@ const configSchema = z.object({
             client_x509_cert_url: z.string()
         }),
         databaseURL: z.string()
-    })
+    }),
+    isProduction: z.boolean()
 });
 
-export type ConfigService = z.infer<typeof configSchema>;
+export type Config = z.infer<typeof configSchema>;
 
-export function createConfigService(): ConfigService {
-    return configSchema.parse({
+export function createConfigService(): Config {
+    const configuration: Config = {
         token: config.get("token"),
         userIds: config.get("userIds"),
-        firebase: config.get("firebase")
-    });
+        firebase: config.get("firebase"),
+        isProduction: process.env["NODE_ENV"] === "production"
+    };
+    return configSchema.parse(configuration);
 }
