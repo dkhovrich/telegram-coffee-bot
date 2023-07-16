@@ -1,6 +1,6 @@
 {
     "name": "telegram-coffee-bot",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "description": "Telegram bot for coffee capsules calculation",
     "main": "index.mjs",
     "type": "module",
