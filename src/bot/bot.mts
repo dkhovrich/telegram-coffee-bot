@@ -37,9 +37,9 @@ export abstract class Bot implements IBot {
             for (const command of this.commands) {
                 command.handle();
             }
-            this.bot.catch(error => this.logger.error("Bot error", { error }));
+            this.bot.catch(error => this.logger.error({ error }, "Bot error"));
         } catch (error) {
-            this.logger.error("Init", { error });
+            this.logger.error({ error }, "Init");
             process.exit(1);
         }
     }
