@@ -1,7 +1,9 @@
 import { createContainer, TOKENS } from "./composition-root.mjs";
 import { initLocalization } from "./localization/localization.mjs";
+import { createLogger } from "./logger.mjs";
 
-console.log(`Starting in ${process.env["NODE_ENV"]} mode`);
+const logger = createLogger("index");
+logger.info("Starting bot", { mode: process.env["NODE_ENV"] });
 
 await initLocalization();
 const container = createContainer();

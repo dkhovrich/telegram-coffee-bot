@@ -4,6 +4,7 @@ import { BotFactory } from "./bot.types.mjs";
 import { ConfigService } from "../services/config.service.mjs";
 import { StorageService } from "../storage/storage.types.mjs";
 import { Middleware } from "./middlewares/middleware.types.mjs";
+import { createLogger } from "../logger.mjs";
 
 export interface IBot {
     init(): Promise<void>;
@@ -13,6 +14,7 @@ export interface IBot {
 export abstract class Bot implements IBot {
     private readonly commands: Command[];
     protected readonly bot: TelegrafBot;
+    protected logger = createLogger("bot");
 
     public constructor(
         commandsFactory: BotFactory<Command[]>,
@@ -35,9 +37,9 @@ export abstract class Bot implements IBot {
             for (const command of this.commands) {
                 command.handle();
             }
-            this.bot.catch(error => console.error("bot error", error));
+            this.bot.catch(error => this.logger.error("Bot error", { error }));
         } catch (error) {
-            console.error("init error", error);
+            this.logger.error("Init", { error });
             process.exit(1);
         }
     }

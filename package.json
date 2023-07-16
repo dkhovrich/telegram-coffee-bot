@@ -7,7 +7,7 @@
     "scripts": {
         "build": "rimraf ./dist && tsc",
         "start": "cross-env NODE_ENV=production BOT_MODE=server node dist/index.mjs",
-        "start:dev": "cross-env NODE_ENV=development BOT_MODE=server node --inspect dist/index.mjs",
+        "start:dev": "cross-env NODE_ENV=development BOT_MODE=server node --inspect dist/index.mjs | bunyan",
         "start:gcloud": "functions-framework --target=bot --source=dist/index.mjs",
         "start:gcloud:dev": "cross-env NODE_ENV=development npm run start:gcloud",
         "start:gcloud:prod": "cross-env NODE_ENV=production npm run start:gcloud",
@@ -28,6 +28,7 @@
     },
     "homepage": "https://github.com/dkhovrich/telegram-coffee-bot#readme",
     "devDependencies": {
+        "@types/bunyan": "^1.8.8",
         "@types/config": "^3.3.0",
         "@types/node": "^20.4.1",
         "@types/uuid": "^9.0.2",
@@ -45,6 +46,7 @@
     "dependencies": {
         "@google-cloud/functions-framework": "^3.3.0",
         "brandi": "^5.0.0",
+        "bunyan": "^1.8.15",
         "config": "^3.3.9",
         "cross-env": "^7.0.3",
         "firebase-admin": "^11.9.0",

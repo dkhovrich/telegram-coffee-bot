@@ -12,10 +12,10 @@ export class BotServer extends Bot {
             process.once("SIGINT", () => this.bot.stop("SIGINT"));
             process.once("SIGTERM", () => this.bot.stop("SIGTERM"));
 
-            console.log("Starting bot in server mode");
+            this.logger.info("Starting bot", { mode: "server" });
             await this.bot.launch();
         } catch (error) {
-            console.error("start error", error);
+            this.logger.error("Start", { error });
             process.exit(1);
         }
     }
