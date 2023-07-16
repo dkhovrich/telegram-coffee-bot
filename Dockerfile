@@ -8,7 +8,7 @@ WORKDIR /src
 COPY package*.json ./
 
 # Install app dependencies
-RUN npm install
+RUN npm ci
 
 # Copy the rest of the application code to the working directory
 COPY . .
@@ -17,4 +17,4 @@ COPY . .
 RUN npm run build
 
 # Start the application
-CMD ["npm", "start"]
+CMD ["npm", "run", "start:gcloud:prod"]
