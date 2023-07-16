@@ -1,7 +1,7 @@
 import { TelegrafBot } from "./types.mjs";
 import { Command } from "./commands/command.mjs";
 import { BotFactory } from "./bot.types.mjs";
-import { Config } from "../services/config.mjs";
+import { Config } from "../config.mjs";
 import { Middleware } from "./middlewares/middleware.types.mjs";
 import { createLogger } from "../logger.mjs";
 

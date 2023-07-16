@@ -1,6 +1,6 @@
 import admin from "firebase-admin";
 import { AddTransactionModel, StorageRepository, Transaction, transactionScheme } from "./storage.types.mjs";
-import { Config } from "../services/config.mjs";
+import { Config } from "../config.mjs";
 
 export class StorageRepositoryFirebase implements StorageRepository {
     private readonly database: admin.firestore.Firestore;

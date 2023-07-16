@@ -1,5 +1,5 @@
 import { Container, Factory, injected, token } from "brandi";
-import { Config, createConfigService } from "./services/config.mjs";
+import { Config, createConfigService } from "./config.mjs";
 import { BotServer } from "./bot/bot.server.mjs";
 import { StartCommand } from "./bot/commands/start.command.mjs";
 import { Command } from "./bot/commands/command.mjs";
