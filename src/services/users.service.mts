@@ -1,4 +1,4 @@
-import { ConfigService } from "./config.service.mjs";
+import { Config } from "../config.mjs";
 
 export interface UsersService {
     users: number[];
@@ -8,7 +8,7 @@ export interface UsersService {
 export class UsersServiceImpl implements UsersService {
     public readonly users: number[];
 
-    constructor(config: ConfigService) {
+    constructor(config: Config) {
         this.users = config.userIds;
     }
 

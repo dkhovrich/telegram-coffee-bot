@@ -1,5 +1,5 @@
 import { Container, Factory, injected, token } from "brandi";
-import { ConfigService, createConfigService } from "./services/config.service.mjs";
+import { Config, createConfigService } from "./config.mjs";
 import { BotServer } from "./bot/bot.server.mjs";
 import { StartCommand } from "./bot/commands/start.command.mjs";
 import { Command } from "./bot/commands/command.mjs";
@@ -12,18 +12,19 @@ import { BalanceCommand } from "./bot/commands/balance.command.mjs";
 import { StorageRepository, StorageService } from "./storage/storage.types.mjs";
 import { StorageServiceImpl } from "./storage/storage.service.mjs";
 import { StorageRepositoryFirebase } from "./storage/storage.repository.firebase.mjs";
-import { StorageRepositorySql } from "./storage/storage.repository.sql.mjs";
 import { UsersService, UsersServiceImpl } from "./services/users.service.mjs";
 import { NotificationService, NotificationServiceImpl } from "./services/notification.service.mjs";
 import { IBaseBot } from "./bot/bot.base.mjs";
 import { TelegrafBot } from "./bot/types.mjs";
 import { BotWebhook } from "./bot/bot.webhook.mjs";
 import { IBot } from "./bot/bot.mjs";
+import { LoggerFactory, LoggerFactoryImpl } from "./logger/logger.factory.mjs";
 
 type BotFactory<T> = Factory<T, [bot: TelegrafBot]>;
 
 export const TOKENS = {
-    configService: token<ConfigService>("config.service"),
+    config: token<Config>("config"),
+    loggerFactory: token<LoggerFactory>("logger.factory"),
     usersService: token<UsersService>("users.service"),
     notificationService: token<BotFactory<NotificationService>>("notification.service"),
     bot: token<IBot>("bot"),
@@ -77,21 +78,19 @@ function bindCommands(container: Container): void {
 export function createContainer(): Container {
     const container = new Container();
 
-    container.bind(TOKENS.configService).toInstance(createConfigService).inSingletonScope();
+    container.bind(TOKENS.config).toInstance(createConfigService).inSingletonScope();
 
-    injected(UsersServiceImpl, TOKENS.configService);
+    injected(LoggerFactoryImpl, TOKENS.config);
+    container.bind(TOKENS.loggerFactory).toInstance(LoggerFactoryImpl).inSingletonScope();
+
+    injected(UsersServiceImpl, TOKENS.config);
     container.bind(TOKENS.usersService).toInstance(UsersServiceImpl).inSingletonScope();
 
     injected(NotificationServiceImpl, TOKENS.usersService);
     container.bind(TOKENS.notificationService).toFactory(NotificationServiceImpl, setBot);
 
-    if (process.env["STORAGE_TYPE"] === "sql") {
-        injected(StorageRepositorySql, TOKENS.configService);
-        container.bind(TOKENS.storageRepository).toInstance(StorageRepositorySql).inSingletonScope();
-    } else {
-        injected(StorageRepositoryFirebase, TOKENS.configService);
-        container.bind(TOKENS.storageRepository).toInstance(StorageRepositoryFirebase).inSingletonScope();
-    }
+    injected(StorageRepositoryFirebase, TOKENS.config);
+    container.bind(TOKENS.storageRepository).toInstance(StorageRepositoryFirebase).inSingletonScope();
 
     injected(StorageServiceImpl, TOKENS.storageRepository);
     container.bind(TOKENS.storageService).toInstance(StorageServiceImpl).inSingletonScope();
@@ -99,12 +98,7 @@ export function createContainer(): Container {
     bindMiddlewares(container);
     bindCommands(container);
 
-    const botDependencies = [
-        TOKENS.commands.all,
-        TOKENS.middlewares.all,
-        TOKENS.configService,
-        TOKENS.storageService
-    ] as const;
+    const botDependencies = [TOKENS.config, TOKENS.loggerFactory, TOKENS.commands.all, TOKENS.middlewares.all] as const;
     if (process.env["BOT_MODE"] === "server") {
         injected(BotServer, ...botDependencies);
         container.bind(TOKENS.bot).toInstance(BotServer).inSingletonScope();

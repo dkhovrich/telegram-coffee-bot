@@ -1,15 +1,7 @@
 import { StorageRepository, StorageService } from "./storage.types.mjs";
-import { createLogger } from "../logger.mjs";
 
 export class StorageServiceImpl implements StorageService {
-    private logger = createLogger("StorageService");
-
     public constructor(private readonly repository: StorageRepository) {}
-
-    public async init(): Promise<void> {
-        this.logger.info("Initialize");
-        await this.repository.init();
-    }
 
     public async get(): Promise<number> {
         const transaction = await this.repository.getLastTransaction();

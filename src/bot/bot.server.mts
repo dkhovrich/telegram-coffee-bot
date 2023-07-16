@@ -15,7 +15,7 @@ export class BotServer extends Bot {
             this.logger.info("Starting bot", { mode: "server" });
             await this.bot.launch();
         } catch (error) {
-            this.logger.error({ error }, "Start");
+            this.logger.error("Start", { error });
             process.exit(1);
         }
     }

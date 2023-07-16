@@ -4,12 +4,6 @@ import { z } from "zod";
 const configSchema = z.object({
     token: z.string(),
     userIds: z.number().array(),
-    sql: z.object({
-        host: z.string(),
-        user: z.string(),
-        password: z.string(),
-        database: z.string()
-    }),
     firebase: z.object({
         credential: z.object({
             type: z.string(),
@@ -24,16 +18,20 @@ const configSchema = z.object({
             client_x509_cert_url: z.string()
         }),
         databaseURL: z.string()
-    })
+    }),
+    isProduction: z.boolean(),
+    isWebHook: z.boolean()
 });
 
-export type ConfigService = z.infer<typeof configSchema>;
+export type Config = z.infer<typeof configSchema>;
 
-export function createConfigService(): ConfigService {
-    return configSchema.parse({
+export function createConfigService(): Config {
+    const configuration: Config = {
         token: config.get("token"),
         userIds: config.get("userIds"),
-        sql: config.get("sql"),
-        firebase: config.get("firebase")
-    });
+        firebase: config.get("firebase"),
+        isProduction: process.env["NODE_ENV"] === "production",
+        isWebHook: process.env["BOT_MODE"] !== "server"
+    };
+    return configSchema.parse(configuration);
 }
