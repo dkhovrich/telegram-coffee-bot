@@ -7,3 +7,4 @@ await initLocalization();
 const container = createContainer();
 const bot = container.get(TOKENS.bot);
 await bot.init();
+await bot.start();

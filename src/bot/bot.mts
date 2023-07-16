@@ -1,42 +1,48 @@
-import { Telegraf } from "telegraf";
-import { ConfigService } from "../services/config.service.mjs";
-import { Middleware } from "./middlewares/middleware.types.mjs";
+import { TelegrafBot } from "./types.mjs";
 import { Command } from "./commands/command.mjs";
+import { BotFactory } from "./bot.types.mjs";
+import { ConfigService } from "../services/config.service.mjs";
 import { StorageService } from "../storage/storage.types.mjs";
-import { BotFactory } from "./bot.factory.types.mjs";
-import { BotContext, TelegrafBot } from "./types.mjs";
+import { Middleware } from "./middlewares/middleware.types.mjs";
 
-export class Bot {
-    private readonly bot: TelegrafBot;
+export interface IBot {
+    init(): Promise<void>;
+    start(): Promise<void>;
+}
+
+export abstract class Bot implements IBot {
     private readonly commands: Command[];
+    protected readonly bot: TelegrafBot;
 
     public constructor(
         commandsFactory: BotFactory<Command[]>,
+        middlewares: Middleware[],
         private readonly config: ConfigService,
-        private readonly storage: StorageService,
-        private readonly middlewares: Middleware[]
+        private readonly storage: StorageService
     ) {
-        this.bot = new Telegraf<BotContext>(this.config.token);
+        this.bot = this.createBot();
         this.commands = commandsFactory(this.bot);
-        this.middlewares.forEach(middleware => this.bot.use(middleware.create()));
+        middlewares.forEach(middleware => this.bot.use(middleware.create()));
+    }
+
+    public get token(): string {
+        return this.config.token;
     }
 
     public async init(): Promise<void> {
         try {
             await this.storage.init();
-
             for (const command of this.commands) {
                 command.handle();
             }
-
-            process.once("SIGINT", () => this.bot.stop("SIGINT"));
-            process.once("SIGTERM", () => this.bot.stop("SIGTERM"));
-
-            console.log("Starting bot");
-            await this.bot.launch();
+            this.bot.catch(error => console.error("bot error", error));
         } catch (error) {
             console.error("init error", error);
             process.exit(1);
         }
     }
+
+    protected abstract createBot(): TelegrafBot;
+
+    public abstract start(): Promise<void>;
 }

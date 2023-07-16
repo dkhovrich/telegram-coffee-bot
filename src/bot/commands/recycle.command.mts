@@ -3,8 +3,8 @@ import { Markup } from "telegraf";
 import { StorageService } from "../../storage/storage.types.mjs";
 import { getUserData } from "./utils.mjs";
 import { NotificationService } from "../../services/notification.service.mjs";
-import { BotFactory } from "../bot.factory.types.mjs";
 import { t } from "i18next";
+import { BotFactory } from "../bot.types.mjs";
 
 export class RecycleCommand extends Command {
     private static readonly CONFIRM_BUTTON_ID = "RESET_CONFIRM_BUTTON_ID";

@@ -5,9 +5,9 @@ import { Markup, Scenes } from "telegraf";
 import { message } from "telegraf/filters";
 import { getUserData } from "./utils.mjs";
 import { NotificationService } from "../../services/notification.service.mjs";
-import { BotFactory } from "../bot.factory.types.mjs";
 import { t } from "i18next";
 import { BotContext } from "../types.mjs";
+import { BotFactory } from "../bot.types.mjs";
 
 export class AddCommand extends Command {
     private static readonly QUESTION_ID = "QUESTION_ID";
