@@ -45,6 +45,7 @@
     },
     "dependencies": {
         "@google-cloud/functions-framework": "^3.3.0",
+        "@google-cloud/logging-bunyan": "^4.2.2",
         "brandi": "^5.0.0",
         "bunyan": "^1.8.15",
         "config": "^3.3.9",
