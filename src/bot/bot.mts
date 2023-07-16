@@ -2,7 +2,6 @@ import { TelegrafBot } from "./types.mjs";
 import { Command } from "./commands/command.mjs";
 import { BotFactory } from "./bot.types.mjs";
 import { ConfigService } from "../services/config.service.mjs";
-import { StorageService } from "../storage/storage.types.mjs";
 import { Middleware } from "./middlewares/middleware.types.mjs";
 import { createLogger } from "../logger.mjs";
 
@@ -17,10 +16,9 @@ export abstract class Bot implements IBot {
     protected logger = createLogger("bot");
 
     public constructor(
-        commandsFactory: BotFactory<Command[]>,
-        middlewares: Middleware[],
         private readonly config: ConfigService,
-        private readonly storage: StorageService
+        commandsFactory: BotFactory<Command[]>,
+        middlewares: Middleware[]
     ) {
         this.bot = this.createBot();
         this.commands = commandsFactory(this.bot);
@@ -33,7 +31,6 @@ export abstract class Bot implements IBot {
 
     public async init(): Promise<void> {
         try {
-            await this.storage.init();
             for (const command of this.commands) {
                 command.handle();
             }

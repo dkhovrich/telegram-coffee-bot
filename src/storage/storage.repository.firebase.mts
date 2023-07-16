@@ -1,7 +1,6 @@
 import admin from "firebase-admin";
-import { StorageRepository, Transaction, transactionScheme } from "./storage.types.mjs";
+import { AddTransactionModel, StorageRepository, Transaction, transactionScheme } from "./storage.types.mjs";
 import { ConfigService } from "../services/config.service.mjs";
-import { AddTransactionModel } from "./storage.repository.sql.mjs";
 
 export class StorageRepositoryFirebase implements StorageRepository {
     private readonly database: admin.firestore.Firestore;
@@ -13,10 +12,6 @@ export class StorageRepositoryFirebase implements StorageRepository {
             databaseURL
         });
         this.database = admin.firestore();
-    }
-
-    public init(): Promise<void> {
-        return Promise.resolve();
     }
 
     public async getLastTransaction(): Promise<Transaction | null> {

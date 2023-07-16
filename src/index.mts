@@ -3,7 +3,7 @@ import { initLocalization } from "./localization/localization.mjs";
 import { createLogger } from "./logger.mjs";
 
 const logger = createLogger("index");
-logger.info("Starting bot", { mode: process.env["NODE_ENV"] });
+logger.info("Starting...", { mode: process.env["NODE_ENV"] });
 
 await initLocalization();
 const container = createContainer();

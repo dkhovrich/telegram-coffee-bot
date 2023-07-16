@@ -12,7 +12,6 @@ import { BalanceCommand } from "./bot/commands/balance.command.mjs";
 import { StorageRepository, StorageService } from "./storage/storage.types.mjs";
 import { StorageServiceImpl } from "./storage/storage.service.mjs";
 import { StorageRepositoryFirebase } from "./storage/storage.repository.firebase.mjs";
-import { StorageRepositorySql } from "./storage/storage.repository.sql.mjs";
 import { UsersService, UsersServiceImpl } from "./services/users.service.mjs";
 import { NotificationService, NotificationServiceImpl } from "./services/notification.service.mjs";
 import { IBaseBot } from "./bot/bot.base.mjs";
@@ -85,13 +84,8 @@ export function createContainer(): Container {
     injected(NotificationServiceImpl, TOKENS.usersService);
     container.bind(TOKENS.notificationService).toFactory(NotificationServiceImpl, setBot);
 
-    if (process.env["STORAGE_TYPE"] === "sql") {
-        injected(StorageRepositorySql, TOKENS.configService);
-        container.bind(TOKENS.storageRepository).toInstance(StorageRepositorySql).inSingletonScope();
-    } else {
-        injected(StorageRepositoryFirebase, TOKENS.configService);
-        container.bind(TOKENS.storageRepository).toInstance(StorageRepositoryFirebase).inSingletonScope();
-    }
+    injected(StorageRepositoryFirebase, TOKENS.configService);
+    container.bind(TOKENS.storageRepository).toInstance(StorageRepositoryFirebase).inSingletonScope();
 
     injected(StorageServiceImpl, TOKENS.storageRepository);
     container.bind(TOKENS.storageService).toInstance(StorageServiceImpl).inSingletonScope();
@@ -99,12 +93,7 @@ export function createContainer(): Container {
     bindMiddlewares(container);
     bindCommands(container);
 
-    const botDependencies = [
-        TOKENS.commands.all,
-        TOKENS.middlewares.all,
-        TOKENS.configService,
-        TOKENS.storageService
-    ] as const;
+    const botDependencies = [TOKENS.configService, TOKENS.commands.all, TOKENS.middlewares.all] as const;
     if (process.env["BOT_MODE"] === "server") {
         injected(BotServer, ...botDependencies);
         container.bind(TOKENS.bot).toInstance(BotServer).inSingletonScope();

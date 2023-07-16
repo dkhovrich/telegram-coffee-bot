@@ -4,12 +4,6 @@ import { z } from "zod";
 const configSchema = z.object({
     token: z.string(),
     userIds: z.number().array(),
-    sql: z.object({
-        host: z.string(),
-        user: z.string(),
-        password: z.string(),
-        database: z.string()
-    }),
     firebase: z.object({
         credential: z.object({
             type: z.string(),
@@ -33,7 +27,6 @@ export function createConfigService(): ConfigService {
     return configSchema.parse({
         token: config.get("token"),
         userIds: config.get("userIds"),
-        sql: config.get("sql"),
         firebase: config.get("firebase")
     });
 }
