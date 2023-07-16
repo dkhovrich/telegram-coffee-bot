@@ -11,6 +11,7 @@ export class BotWebhook extends Bot {
     public async start(): Promise<void> {
         console.log("Starting bot in WebHook mode");
         functions.http("bot", async (request, response) => {
+            console.dir(request.body, { depth: null });
             await this.bot.handleUpdate(request.body, response);
         });
     }
