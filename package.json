@@ -6,13 +6,13 @@
     "type": "module",
     "scripts": {
         "build": "rimraf ./dist && tsc",
+        "build:noEmit": "tsc --noEmit",
         "start": "functions-framework --target=bot --source=dist/index.mjs",
         "start:dev:server": "cross-env NODE_ENV=development BOT_MODE=server node --inspect dist/index.mjs | bunyan",
         "prettier:check": "prettier . --check",
         "prettier:write": "prettier . --write",
         "lint:check": "eslint ./src --ext .mts",
-        "lint:format": "eslint ./src --ext .mts --fix",
-        "build:noEmit": "tsc --noEmit"
+        "lint:format": "eslint ./src --ext .mts --fix"
     },
     "repository": {
         "type": "git",

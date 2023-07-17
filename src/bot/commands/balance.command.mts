@@ -1,15 +1,15 @@
 import { Command } from "./command.mjs";
-import { StorageService } from "../../storage/storage.types.mjs";
 import { t } from "i18next";
+import { CapsulesService } from "../../services/capsules.service.mjs";
 
 export class BalanceCommand extends Command {
-    public constructor(private readonly storage: StorageService) {
+    public constructor(private readonly capsulesService: CapsulesService) {
         super();
     }
 
     public handle(): void {
         this.bot.command("balance", async ctx => {
-            const amount = await this.storage.get();
+            const amount = await this.capsulesService.getAmount();
             ctx.reply(t("balanceCommandReply", { amount }) as string);
         });
     }

@@ -9,9 +9,9 @@ import { AuthMiddleware } from "./bot/middlewares/auth.middleware.mjs";
 import { AddCommand } from "./bot/commands/add.command.mjs";
 import { RecycleCommand } from "./bot/commands/recycle.command.mjs";
 import { BalanceCommand } from "./bot/commands/balance.command.mjs";
-import { StorageRepository, StorageService } from "./storage/storage.types.mjs";
-import { StorageServiceImpl } from "./storage/storage.service.mjs";
-import { StorageRepositoryFirebase } from "./storage/storage.repository.firebase.mjs";
+import { Storage } from "./storage/storage.types.mjs";
+import { CapsulesService, CapsulesServiceImpl } from "./services/capsules.service.mjs";
+import { StorageFirebase } from "./storage/storage.firebase.mjs";
 import { UsersService, UsersServiceImpl } from "./services/users.service.mjs";
 import { NotificationService, NotificationServiceImpl } from "./services/notification.service.mjs";
 import { IBaseBot } from "./bot/bot.base.mjs";
@@ -19,6 +19,7 @@ import { TelegrafBot } from "./bot/types.mjs";
 import { BotWebhook } from "./bot/bot.webhook.mjs";
 import { IBot } from "./bot/bot.mjs";
 import { LoggerFactory, LoggerFactoryImpl } from "./logger/logger.factory.mjs";
+import { StorageStub } from "./storage/storage.stub.mjs";
 
 type BotFactory<T> = Factory<T, [bot: TelegrafBot]>;
 
@@ -28,8 +29,8 @@ export const TOKENS = {
     usersService: token<UsersService>("users.service"),
     notificationService: token<BotFactory<NotificationService>>("notification.service"),
     bot: token<IBot>("bot"),
-    storageRepository: token<StorageRepository>("storage.repository"),
-    storageService: token<StorageService>("storage"),
+    storage: token<Storage>("storage"),
+    capsulesService: token<CapsulesService>("capsules.service"),
     middlewares: {
         session: token<Middleware>("middleware.session"),
         auth: token<Middleware>("middleware.auth"),
@@ -60,13 +61,13 @@ function bindMiddlewares(container: Container): void {
 function bindCommands(container: Container): void {
     container.bind(TOKENS.commands.start).toFactory(StartCommand, setBot);
 
-    injected(AddCommand, TOKENS.storageService, TOKENS.notificationService);
+    injected(AddCommand, TOKENS.capsulesService, TOKENS.notificationService);
     container.bind(TOKENS.commands.add).toFactory(AddCommand, setBot);
 
-    injected(RecycleCommand, TOKENS.storageService, TOKENS.notificationService);
+    injected(RecycleCommand, TOKENS.capsulesService, TOKENS.notificationService);
     container.bind(TOKENS.commands.recycle).toFactory(RecycleCommand, setBot);
 
-    injected(BalanceCommand, TOKENS.storageService);
+    injected(BalanceCommand, TOKENS.capsulesService);
     container.bind(TOKENS.commands.balance).toFactory(BalanceCommand, setBot);
 
     container.bind(TOKENS.commands.all).toConstant(bot => {
@@ -89,11 +90,15 @@ export function createContainer(): Container {
     injected(NotificationServiceImpl, TOKENS.usersService);
     container.bind(TOKENS.notificationService).toFactory(NotificationServiceImpl, setBot);
 
-    injected(StorageRepositoryFirebase, TOKENS.config);
-    container.bind(TOKENS.storageRepository).toInstance(StorageRepositoryFirebase).inSingletonScope();
+    if (process.env["STORAGE"] === "stub") {
+        container.bind(TOKENS.storage).toInstance(StorageStub).inSingletonScope();
+    } else {
+        injected(StorageFirebase, TOKENS.config);
+        container.bind(TOKENS.storage).toInstance(StorageFirebase).inSingletonScope();
+    }
 
-    injected(StorageServiceImpl, TOKENS.storageRepository);
-    container.bind(TOKENS.storageService).toInstance(StorageServiceImpl).inSingletonScope();
+    injected(CapsulesServiceImpl, TOKENS.storage);
+    container.bind(TOKENS.capsulesService).toInstance(CapsulesServiceImpl).inSingletonScope();
 
     bindMiddlewares(container);
     bindCommands(container);

@@ -19,6 +19,7 @@ const configSchema = z.object({
         }),
         databaseURL: z.string()
     }),
+    isStorageStub: z.boolean(),
     isProduction: z.boolean(),
     isWebHook: z.boolean()
 });
@@ -30,6 +31,7 @@ export function createConfigService(): Config {
         token: config.get("token"),
         userIds: config.get("userIds"),
         firebase: config.get("firebase"),
+        isStorageStub: process.env["STORAGE"] === "stub",
         isProduction: process.env["NODE_ENV"] === "production",
         isWebHook: process.env["BOT_MODE"] !== "server"
     };
