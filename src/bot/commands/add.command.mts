@@ -1,13 +1,13 @@
 import { z } from "zod";
 import { Command } from "./command.mjs";
-import { StorageService } from "../../storage/storage.types.mjs";
 import { Markup, Scenes } from "telegraf";
 import { message } from "telegraf/filters";
-import { getUserData } from "./utils.mjs";
+import { getUserData, UserData } from "./utils.mjs";
 import { NotificationService } from "../../services/notification.service.mjs";
 import { t } from "i18next";
 import { BotContext } from "../types.mjs";
 import { BotFactory } from "../bot.types.mjs";
+import { CapsulesService } from "../../services/capsules.service.mjs";
 
 export class AddCommand extends Command {
     private static readonly QUESTION_ID = "QUESTION_ID";
@@ -15,7 +15,7 @@ export class AddCommand extends Command {
     private static readonly CANCEL_BUTTON_ID = "ADD_CANCEL_BUTTON_ID";
 
     public constructor(
-        private readonly storage: StorageService,
+        private readonly capsulesService: CapsulesService,
         private readonly notificationServiceFactory: BotFactory<NotificationService>
     ) {
         super();
@@ -73,19 +73,14 @@ export class AddCommand extends Command {
             if (ctx.session.addValue == null || ctx.from == null) return;
 
             const user = getUserData(ctx.from);
-            const amount = await this.storage.add(ctx.session.addValue, user.name);
+            const amount = await this.capsulesService.add(ctx.session.addValue, user.name);
             const responseText = t(ctx.session.addValue > 0 ? "addCommandResponseAdd" : "addCommandResponseRemove", {
                 count: Math.abs(ctx.session.addValue),
                 amount
             });
             ctx.editMessageText(responseText);
 
-            const notificationService = this.notificationServiceFactory(this.bot);
-            const notificationText = t(
-                ctx.session.addValue > 0 ? "addCommandNotificationAdd" : "addCommandNotificationRemove",
-                { user: user.displayName, count: Math.abs(ctx.session.addValue), amount }
-            );
-            await notificationService.notifyAll(user.id, notificationText);
+            await this.notify(user, ctx.session.addValue, amount);
             ctx.session.addValue = null;
         });
 
@@ -93,5 +88,15 @@ export class AddCommand extends Command {
             ctx.editMessageText(t("addCommandCancel"));
             ctx.session.addValue = null;
         });
+    }
+
+    private async notify(user: UserData, addValue: number, amount: number): Promise<void> {
+        const notificationService = this.notificationServiceFactory(this.bot);
+        const notificationText = t(addValue > 0 ? "addCommandNotificationAdd" : "addCommandNotificationRemove", {
+            user: user.displayName,
+            count: Math.abs(addValue),
+            amount
+        });
+        await notificationService.notifyAll(user.id, notificationText);
     }
 }
