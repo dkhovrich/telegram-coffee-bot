@@ -17,7 +17,7 @@ export class LoggerFactoryImpl implements LoggerFactory {
     }
 
     private createStream(): Stream {
-        if (this.config.isProduction && this.config.isWebHook) {
+        if (this.config.isGoogleCloudEnvironment) {
             return new LoggingBunyan().stream("info");
         }
         return { stream: process.stdout, level: "info" };

@@ -4,8 +4,8 @@ import { initLocalization } from "./localization/localization.mjs";
 const container = createContainer();
 const logger = container.get(TOKENS.loggerFactory).create("index");
 
-const { isProduction, isStorageStub } = container.get(TOKENS.config);
-logger.info("Starting...", { isProduction, isStorageStub });
+const { isProduction, isStorageStub, isGoogleCloudEnvironment } = container.get(TOKENS.config);
+logger.info("Starting...", { isProduction, isStorageStub, isGoogleCloudEnvironment });
 
 await initLocalization();
 const bot = container.get(TOKENS.bot);
