@@ -59,6 +59,7 @@ function bindMiddlewares(container: Container): void {
 }
 
 function bindCommands(container: Container): void {
+    injected(StartCommand, TOKENS.notificationService);
     container.bind(TOKENS.commands.start).toFactory(StartCommand, setBot);
 
     injected(AddCommand, TOKENS.capsulesService, TOKENS.notificationService);
@@ -67,7 +68,7 @@ function bindCommands(container: Container): void {
     injected(RecycleCommand, TOKENS.capsulesService, TOKENS.notificationService);
     container.bind(TOKENS.commands.recycle).toFactory(RecycleCommand, setBot);
 
-    injected(BalanceCommand, TOKENS.capsulesService);
+    injected(BalanceCommand, TOKENS.capsulesService, TOKENS.notificationService);
     container.bind(TOKENS.commands.balance).toFactory(BalanceCommand, setBot);
 
     container.bind(TOKENS.commands.all).toConstant(bot => {

@@ -1,6 +1,6 @@
 import { Command } from "./command.mjs";
 import { Markup } from "telegraf";
-import { getUserData, UserData } from "./utils.mjs";
+import { getUserData } from "./utils.mjs";
 import { NotificationService } from "../../services/notification.service.mjs";
 import { t } from "i18next";
 import { BotFactory } from "../bot.types.mjs";
@@ -12,9 +12,9 @@ export class RecycleCommand extends Command {
 
     public constructor(
         private readonly capsulesService: CapsulesService,
-        private readonly notificationServiceFactory: BotFactory<NotificationService>
+        notificationServiceFactory: BotFactory<NotificationService>
     ) {
-        super();
+        super(notificationServiceFactory);
     }
 
     public handle(): void {
@@ -49,16 +49,11 @@ export class RecycleCommand extends Command {
             await this.capsulesService.recycle(user.name);
             ctx.editMessageText(t("recycleCommandResponse"));
 
-            await this.notify(user);
+            await this.notificationService.notifyRecycle(user);
         });
 
         this.bot.action(RecycleCommand.CANCEL_BUTTON_ID, async ctx => {
             ctx.editMessageText(t("recycleCommandCancel"));
         });
-    }
-
-    private async notify(user: UserData): Promise<void> {
-        const notificationService = this.notificationServiceFactory(this.bot);
-        await notificationService.notifyAll(user.id, t("recycleCommandNotification", { user: user.displayName }));
     }
 }
