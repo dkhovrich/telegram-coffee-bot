@@ -2,7 +2,7 @@ import { z } from "zod";
 import { Command } from "./command.mjs";
 import { Markup, Scenes } from "telegraf";
 import { message } from "telegraf/filters";
-import { getUserData, UserData } from "./utils.mjs";
+import { getUserData } from "./utils.mjs";
 import { NotificationService } from "../../services/notification.service.mjs";
 import { t } from "i18next";
 import { BotContext } from "../types.mjs";
@@ -16,9 +16,9 @@ export class AddCommand extends Command {
 
     public constructor(
         private readonly capsulesService: CapsulesService,
-        private readonly notificationServiceFactory: BotFactory<NotificationService>
+        notificationServiceFactory: BotFactory<NotificationService>
     ) {
-        super();
+        super(notificationServiceFactory);
     }
 
     public handle(): void {
@@ -80,7 +80,7 @@ export class AddCommand extends Command {
             });
             ctx.editMessageText(responseText);
 
-            await this.notify(user, ctx.session.addValue, amount);
+            await this.notificationService.notifyAdd(user, ctx.session.addValue, amount);
             ctx.session.addValue = null;
         });
 
@@ -88,15 +88,5 @@ export class AddCommand extends Command {
             ctx.editMessageText(t("addCommandCancel"));
             ctx.session.addValue = null;
         });
-    }
-
-    private async notify(user: UserData, addValue: number, amount: number): Promise<void> {
-        const notificationService = this.notificationServiceFactory(this.bot);
-        const notificationText = t(addValue > 0 ? "addCommandNotificationAdd" : "addCommandNotificationRemove", {
-            user: user.displayName,
-            count: Math.abs(addValue),
-            amount
-        });
-        await notificationService.notifyAll(user.id, notificationText);
     }
 }
